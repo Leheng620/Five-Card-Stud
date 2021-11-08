@@ -61,3 +61,8 @@ card_type_map = {
     QUADRUPLE: 'quadruple',
     STRAIGHTFLUSH: 'straight flush'
 }
+
+class Actions:
+    FOLD = 0
+    CHECK = 1
+    RAISE = 2

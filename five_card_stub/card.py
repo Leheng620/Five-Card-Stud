@@ -39,10 +39,12 @@ def create_half_deck():
 
 # -------------------sort functions---------------------
 
+def cmp_one_card(player_obj):
+    return player_obj.revealed_cards[0]
 
 def cmp_two_cards(player_obj, cards = None):
     if cards is None:
-        two_cards = [player_obj.reveal_cards[0], player_obj.reveal_cards[1]]
+        two_cards = [player_obj.revealed_cards[0], player_obj.revealed_cards[1]]
     else:
         two_cards = cards.copy()
     two_cards.sort()
@@ -55,7 +57,7 @@ def cmp_two_cards(player_obj, cards = None):
 
 def cmp_three_cards(player_obj, cards = None):
     if cards is None:
-        three_cards = [player_obj.reveal_cards[0], player_obj.reveal_cards[1], player_obj.reveal_cards[2]]
+        three_cards = [player_obj.revealed_cards[0], player_obj.revealed_cards[1], player_obj.revealed_cards[2]]
     else:
         three_cards = cards.copy()
     three_cards.sort()
@@ -71,7 +73,7 @@ def cmp_three_cards(player_obj, cards = None):
 
 def cmp_four_cards(player_obj, cards = None):
     if cards is None:
-        four_cards = [i for i in player_obj.reveal_cards]
+        four_cards = [i for i in player_obj.revealed_cards]
     else:
         four_cards = cards.copy()
     four_cards.sort()
@@ -102,7 +104,7 @@ def cmp_four_cards(player_obj, cards = None):
 
 def cmp_five_cards(player_obj, cards = None):
     if cards is None:
-        five_cards = [i for i in player_obj.reveal_cards] + [player_obj.secret_card]
+        five_cards = [i for i in player_obj.revealed_cards] + [player_obj.secret_card]
     else:
         five_cards = cards.copy()
     five_cards.sort()
@@ -147,4 +149,10 @@ def cmp_five_cards(player_obj, cards = None):
     else:
         return NOPAIR, card_rank_weight[five_cards[4].num], card_suit_order[five_cards[4].suit]
 
-
+cmp_func_map = {
+    1: cmp_one_card,
+    2: cmp_two_cards,
+    3: cmp_three_cards,
+    4: cmp_four_cards,
+    5: cmp_five_cards
+}
