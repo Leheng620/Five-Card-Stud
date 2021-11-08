@@ -9,11 +9,11 @@ class Card():
     def same_suit(self, card):
         return self.suit == card.suit
 
-    def same_number(self, card):
+    def same_rank(self, card):
         return self.rank == card.rank
 
     def __eq__(self, other):
-        return self.same_number(other) and self.same_suit(other)
+        return self.same_rank(other) and self.same_suit(other)
 
     def __lt__(self, other):
         if card_rank_weight[self.rank] < card_rank_weight[other.rank]:
@@ -22,22 +22,34 @@ class Card():
             return card_suit_order[self.suit] < card_suit_order[other.suit]
         return False
 
-def match_rank_to_card(rank):
-    suit = (rank - 1) // 13
-    rank %= 13
+def match_num_to_card(num):
+    '''
+    Convert a number(1-52) into a Card object.
+    The order of suits is defined in constants.card_suit
+    :param num: card number
+    :return: a Card object
+    '''
+    suit = (num - 1) // 13
+    rank = num % 13
     if rank == 0:
         rank = 13
     c = Card(card_suit[suit], rank)
     return c
 
-def match_card_to_rank(card):
-    num = card_rank[card.suit] * 13 + card.num
+def match_card_to_num(card):
+    '''
+    Covert a Card object into number.
+    :param card: Card object
+    :return: number
+    '''
+    num = card_rank[card.suit] * 13 + card.rank
     return num
 
 def create_half_deck():
     return [Card(j, i) for j in ['brick', 'club', 'heart', 'blade'] for i in [1,8,9,10,11,12,13]]
 
 # -------------------sort functions---------------------
+# Sort each player object based on their card type. These functions are passed as "key" in the sort function.
 
 def cmp_one_card(player_obj):
     return player_obj.revealed_cards[0]
@@ -48,7 +60,7 @@ def cmp_two_cards(player_obj, cards = None):
     else:
         two_cards = cards.copy()
     two_cards.sort()
-    if two_cards[0].same_number(two_cards[1]):  # a pair
+    if two_cards[0].same_rank(two_cards[1]):  # a pair
         # return a tuple (class type, card number, card suit)
         return ONEPAIR, card_rank_weight[two_cards[0].num] , card_suit_order[two_cards[1].suit]
     else:  # two cards' numbers are different
@@ -61,11 +73,11 @@ def cmp_three_cards(player_obj, cards = None):
     else:
         three_cards = cards.copy()
     three_cards.sort()
-    if three_cards[0].same_number(three_cards[1]) and three_cards[0].same_number(three_cards[2]):
+    if three_cards[0].same_rank(three_cards[1]) and three_cards[0].same_rank(three_cards[2]):
         return TRIPLE, card_rank_weight[three_cards[0].num], card_suit_order[three_cards[2].suit]
-    elif three_cards[0].same_number(three_cards[1]):
+    elif three_cards[0].same_rank(three_cards[1]):
         return ONEPAIR, card_rank_weight[three_cards[0].num], card_suit_order[three_cards[1].suit]
-    elif three_cards[1].same_number(three_cards[2]):
+    elif three_cards[1].same_rank(three_cards[2]):
         return ONEPAIR, card_rank_weight[three_cards[1].num], card_suit_order[three_cards[2].suit]
     else:
         return NOPAIR, card_rank_weight[three_cards[2].num], card_suit_order[three_cards[2].suit]
@@ -77,19 +89,19 @@ def cmp_four_cards(player_obj, cards = None):
     else:
         four_cards = cards.copy()
     four_cards.sort()
-    if four_cards[0].same_number(four_cards[1]) and four_cards[0].same_number(four_cards[2]) and four_cards[0].same_number(four_cards[3]):
+    if four_cards[0].same_rank(four_cards[1]) and four_cards[0].same_rank(four_cards[2]) and four_cards[0].same_rank(four_cards[3]):
         return QUADRUPLE, card_rank_weight[four_cards[0].num], card_suit_order[four_cards[3].suit]
-    elif four_cards[0].same_number(four_cards[1]) and four_cards[0].same_number(four_cards[2]):
+    elif four_cards[0].same_rank(four_cards[1]) and four_cards[0].same_rank(four_cards[2]):
         return TRIPLE, card_rank_weight[four_cards[0].num], card_suit_order[four_cards[2].suit]
-    elif four_cards[1].same_number(four_cards[2]) and four_cards[1].same_number(four_cards[3]):
+    elif four_cards[1].same_rank(four_cards[2]) and four_cards[1].same_rank(four_cards[3]):
         return TRIPLE, card_rank_weight[four_cards[1].num], card_suit_order[four_cards[3].suit]
-    elif four_cards[0].same_number(four_cards[1]) and four_cards[2].same_number(four_cards[3]):
+    elif four_cards[0].same_rank(four_cards[1]) and four_cards[2].same_rank(four_cards[3]):
         return TWOPAIR, card_rank_weight[four_cards[2].num], card_suit_order[four_cards[3].suit]
-    elif four_cards[0].same_number(four_cards[1]):
+    elif four_cards[0].same_rank(four_cards[1]):
         return ONEPAIR, card_rank_weight[four_cards[0].num], card_suit_order[four_cards[1].suit]
-    elif four_cards[1].same_number(four_cards[2]):
+    elif four_cards[1].same_rank(four_cards[2]):
         return ONEPAIR, card_rank_weight[four_cards[1].num], card_suit_order[four_cards[2].suit]
-    elif four_cards[2].same_number(four_cards[3]):
+    elif four_cards[2].same_rank(four_cards[3]):
         return ONEPAIR, card_rank_weight[four_cards[2].num], card_suit_order[four_cards[3].suit]
     elif four_cards[0].same_suit(four_cards[1]) and four_cards[0].same_suit(four_cards[2]) and four_cards[0].same_suit(four_cards[3]):
         if len([card_rank_weight[four_cards[i].num] for i in range(1, len(four_cards)) if card_rank_weight[four_cards[i].num] == card_rank_weight[four_cards[i-1].num]+1]) == 4:
@@ -104,7 +116,7 @@ def cmp_four_cards(player_obj, cards = None):
 
 def cmp_five_cards(player_obj, cards = None):
     if cards is None:
-        five_cards = [i for i in player_obj.revealed_cards] + [player_obj.secret_card]
+        five_cards = [i for i in player_obj.revealed_cards] + [player_obj.__secret_card]
     else:
         five_cards = cards.copy()
     five_cards.sort()

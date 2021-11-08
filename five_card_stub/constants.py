@@ -1,5 +1,6 @@
 import random
 
+# Map number(1-52) to 52 cards
 card_suit = {
     0: 'blade',
     1: 'heart',
@@ -13,7 +14,7 @@ card_rank = {
     'club': 3,
 }
 
-# define cards
+# Define the weighting of each suit and each rank to be used for card comparison
 card_suit_order = {
     'blade': 5,
     'heart': 4,
@@ -41,6 +42,7 @@ card_rank_weight = {
 half_deck_count = 28
 # half_deck_index_map = {0: 0, 1: 1, 2: 2, 4: 3, 5: 4}
 
+# Define the weighting for different card type to be used for determining the winner
 NOPAIR = 1
 ONEPAIR = 2
 TWOPAIR = 3

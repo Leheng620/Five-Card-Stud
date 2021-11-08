@@ -3,11 +3,12 @@ import random
 
 class AbstractPlayer:
     def __init__(self, balance, index, cards, chip, alive):
-        self.balance = balance
+        self.balance = balance # the player's balance.
         self.index = index
-        self.cards = cards
-        self.revealed_cards = cards[1:]
-        self.chip = chip
+        self.cards = cards # all cards on deck
+        self.__secret_card = cards[0] # the face-down card, only self can access
+        self.revealed_cards = cards[1:] # the cards being revealed to other players
+        self.chip = chip # current chip the player has raised
         self.alive = alive
         self.last_action = None
 
