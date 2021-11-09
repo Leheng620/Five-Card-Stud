@@ -4,38 +4,53 @@ from random import shuffle
 from collections import deque
 
 class GameState:
-    def __init__(self, n_players, balance):
+    def __init__(self, n_players=2, balance=100):
         '''
-        round:            rounds of card dealing so far
-                          round 0 => two cards each player
-                          rount 1-3 => one card each player
-        to_player:        the next player to act
-        players:          all the players
-        alive_indices:    indecies of players still alive, initially [0, n_players-1]
-        chip:             the chips on the table
-        card_stack:       cards in the heap
+        round:          rounds of card dealing so far
+                        round 0 => two cards each player
+                        rount 1-3 => one card each player
+        players:        all the players
+        alive_indices:  indecies of players still alive, initially [0, n_players-1]
+        player_queue:   queue of players indices (in the order of play in the current betting round)
+        total_chips:    the total number of chips on the table
+        card_stack:     cards in the heap, shuffled
+        first_player:   Index of the player with best cards (among the alive players), 
+                        betting & dealling start from this player
         '''
-        self.round = 0
-        self.to_play = None
-        self.players = [Agent(balance, i, [], 0, True) for i in range(n_players)]
+        self.round = 1
+        self.n_players = n_players
+        self.players = None
         self.alive_indices = list(range(n_players))
         self.player_queue = deque()
         self.total_chips = 0
         self.card_stack = deque(create_half_deck())
         shuffle(self.card_stack)
+        self.print_card_stack()
+
+        self.initializePlayers(balance)
+        self.first_player = 0
+
+    
+    def initializePlayers(self, balance):
+        '''
+        Deal two cards to each player, and initialize the players array
+        '''
+        init_card_pairs = [[] for _ in range(self.n_players)]
+        for _ in range(2):
+            for i in self.alive_indices:
+                top_card = self.card_stack.popleft()
+                init_card_pairs[i].append(top_card)
+        self.players = [Agent(balance, i, card_pair, 0, True) for i, card_pair in enumerate(init_card_pairs)]
 
     def deal(self):
         '''
-        Deal cards to each alive player
+        Deal one card to each alive player, increment the round count
         '''
-        dealing_rounds = 2 if self.round == 0 else 1
-
-        for _ in range(dealing_rounds):
-            for i in self.alive_indices:
-                player = self.players[i]
-                top_card = self.card_stack.popleft()
-                player.append_card(top_card)
-                self.card_stack
+        ordering = self.alive_indices[self.first_player:] + self.alive_indices[:self.first_player]
+        for i in ordering:
+            player = self.players[i]
+            top_card = self.card_stack.popleft()
+            player.append_card(top_card)
         
         self.round += 1
 
@@ -44,7 +59,6 @@ class GameState:
         self.player_queue.append(player_idx)
 
         return self.players[player_idx]
-
     
     def build_player_queue(self):
         '''
@@ -52,8 +66,8 @@ class GameState:
         '''
         alive_p = self.get_alive_players()
         alive_p.sort(key=cmp_func_map[self.round])
-        idx = alive_p[0].index
-        self.player_queue.extend(self.alive_indices[idx:] + self.alive_indices[:idx])
+        self.first_player = alive_p[-1].index
+        self.player_queue.extend(self.alive_indices[self.first_player:] + self.alive_indices[:self.first_player])
     
     def get_player_queue(self):
         return self.player_queue
@@ -65,6 +79,8 @@ class GameState:
         return [self.players[i] for i in self.alive_indices]
 
     def is_round_end(self):
+        if len(self.get_alive_players()) < 2:
+            return True
         for p in self.get_alive_players():
             if p.last_action != Actions.CHECK:
                 return False
@@ -86,9 +102,14 @@ class GameState:
         for p in self.players:
             print("Player %d" % p.index)
             for c in p.cards:
-                print(c.suit, c.rank, sep=', ')
+                print(c.suit, c.rank, sep=', ', end='; ')
             print()
         print("------------------------------")
+
+    def print_card_stack(self):
+        for c in self.card_stack:
+            print(c.suit, c.rank, sep=', ', end='; ')
+        print()
 
 
 

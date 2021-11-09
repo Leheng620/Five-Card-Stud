@@ -62,9 +62,9 @@ def cmp_two_cards(player_obj, cards = None):
     two_cards.sort()
     if two_cards[0].same_rank(two_cards[1]):  # a pair
         # return a tuple (class type, card number, card suit)
-        return ONEPAIR, card_rank_weight[two_cards[0].num] , card_suit_order[two_cards[1].suit]
+        return ONEPAIR, card_rank_weight[two_cards[0].rank] , card_suit_order[two_cards[1].suit]
     else:  # two cards' numbers are different
-        return NOPAIR, card_rank_weight[two_cards[1].num], card_suit_order[two_cards[1].suit]
+        return NOPAIR, card_rank_weight[two_cards[1].rank], card_suit_order[two_cards[1].suit]
 
 
 def cmp_three_cards(player_obj, cards = None):
@@ -74,13 +74,13 @@ def cmp_three_cards(player_obj, cards = None):
         three_cards = cards.copy()
     three_cards.sort()
     if three_cards[0].same_rank(three_cards[1]) and three_cards[0].same_rank(three_cards[2]):
-        return TRIPLE, card_rank_weight[three_cards[0].num], card_suit_order[three_cards[2].suit]
+        return TRIPLE, card_rank_weight[three_cards[0].rank], card_suit_order[three_cards[2].suit]
     elif three_cards[0].same_rank(three_cards[1]):
-        return ONEPAIR, card_rank_weight[three_cards[0].num], card_suit_order[three_cards[1].suit]
+        return ONEPAIR, card_rank_weight[three_cards[0].rank], card_suit_order[three_cards[1].suit]
     elif three_cards[1].same_rank(three_cards[2]):
-        return ONEPAIR, card_rank_weight[three_cards[1].num], card_suit_order[three_cards[2].suit]
+        return ONEPAIR, card_rank_weight[three_cards[1].rank], card_suit_order[three_cards[2].suit]
     else:
-        return NOPAIR, card_rank_weight[three_cards[2].num], card_suit_order[three_cards[2].suit]
+        return NOPAIR, card_rank_weight[three_cards[2].rank], card_suit_order[three_cards[2].suit]
 
 
 def cmp_four_cards(player_obj, cards = None):
@@ -90,28 +90,28 @@ def cmp_four_cards(player_obj, cards = None):
         four_cards = cards.copy()
     four_cards.sort()
     if four_cards[0].same_rank(four_cards[1]) and four_cards[0].same_rank(four_cards[2]) and four_cards[0].same_rank(four_cards[3]):
-        return QUADRUPLE, card_rank_weight[four_cards[0].num], card_suit_order[four_cards[3].suit]
+        return QUADRUPLE, card_rank_weight[four_cards[0].rank], card_suit_order[four_cards[3].suit]
     elif four_cards[0].same_rank(four_cards[1]) and four_cards[0].same_rank(four_cards[2]):
-        return TRIPLE, card_rank_weight[four_cards[0].num], card_suit_order[four_cards[2].suit]
+        return TRIPLE, card_rank_weight[four_cards[0].rank], card_suit_order[four_cards[2].suit]
     elif four_cards[1].same_rank(four_cards[2]) and four_cards[1].same_rank(four_cards[3]):
-        return TRIPLE, card_rank_weight[four_cards[1].num], card_suit_order[four_cards[3].suit]
+        return TRIPLE, card_rank_weight[four_cards[1].rank], card_suit_order[four_cards[3].suit]
     elif four_cards[0].same_rank(four_cards[1]) and four_cards[2].same_rank(four_cards[3]):
-        return TWOPAIR, card_rank_weight[four_cards[2].num], card_suit_order[four_cards[3].suit]
+        return TWOPAIR, card_rank_weight[four_cards[2].rank], card_suit_order[four_cards[3].suit]
     elif four_cards[0].same_rank(four_cards[1]):
-        return ONEPAIR, card_rank_weight[four_cards[0].num], card_suit_order[four_cards[1].suit]
+        return ONEPAIR, card_rank_weight[four_cards[0].rank], card_suit_order[four_cards[1].suit]
     elif four_cards[1].same_rank(four_cards[2]):
-        return ONEPAIR, card_rank_weight[four_cards[1].num], card_suit_order[four_cards[2].suit]
+        return ONEPAIR, card_rank_weight[four_cards[1].rank], card_suit_order[four_cards[2].suit]
     elif four_cards[2].same_rank(four_cards[3]):
-        return ONEPAIR, card_rank_weight[four_cards[2].num], card_suit_order[four_cards[3].suit]
+        return ONEPAIR, card_rank_weight[four_cards[2].rank], card_suit_order[four_cards[3].suit]
     elif four_cards[0].same_suit(four_cards[1]) and four_cards[0].same_suit(four_cards[2]) and four_cards[0].same_suit(four_cards[3]):
-        if len([card_rank_weight[four_cards[i].num] for i in range(1, len(four_cards)) if card_rank_weight[four_cards[i].num] == card_rank_weight[four_cards[i-1].num]+1]) == 4:
-            return STRAIGHTFLUSH, card_rank_weight[four_cards[3].num], card_suit_order[four_cards[0].suit]
+        if len([card_rank_weight[four_cards[i].rank] for i in range(1, len(four_cards)) if card_rank_weight[four_cards[i].rank] == card_rank_weight[four_cards[i-1].rank]+1]) == 4:
+            return STRAIGHTFLUSH, card_rank_weight[four_cards[3].rank], card_suit_order[four_cards[0].suit]
         else:
-            return FLUSH, card_rank_weight[four_cards[3].num], card_suit_order[four_cards[0].suit]
-    elif len([card_rank_weight[four_cards[i].num] for i in range(1, len(four_cards)) if card_rank_weight[four_cards[i].num] == card_rank_weight[four_cards[i-1].num]+1]) == 4:
-        return STRAIGHT, card_rank_weight[four_cards[3].num], card_suit_order[four_cards[3].suit]
+            return FLUSH, card_rank_weight[four_cards[3].rank], card_suit_order[four_cards[0].suit]
+    elif len([card_rank_weight[four_cards[i].rank] for i in range(1, len(four_cards)) if card_rank_weight[four_cards[i].rank] == card_rank_weight[four_cards[i-1].rank]+1]) == 4:
+        return STRAIGHT, card_rank_weight[four_cards[3].rank], card_suit_order[four_cards[3].suit]
     else:
-        return NOPAIR, card_rank_weight[four_cards[3].num], card_suit_order[four_cards[3].suit]
+        return NOPAIR, card_rank_weight[four_cards[3].rank], card_suit_order[four_cards[3].suit]
 
 
 def cmp_five_cards(player_obj, cards = None):
@@ -120,13 +120,13 @@ def cmp_five_cards(player_obj, cards = None):
     else:
         five_cards = cards.copy()
     five_cards.sort()
-    find_straight = [card_rank_weight[five_cards[i].num] for i in range(1, len(five_cards)) if card_rank_weight[five_cards[i].num] == card_rank_weight[five_cards[i-1].num]+1]
+    find_straight = [card_rank_weight[five_cards[i].rank] for i in range(1, len(five_cards)) if card_rank_weight[five_cards[i].rank] == card_rank_weight[five_cards[i-1].rank]+1]
     find_flush = [card_suit_order[five_cards[i].suit] for i in range(1, len(five_cards)) if card_suit_order[five_cards[i].suit] == card_suit_order[five_cards[i-1].suit]]
     find_pair = [five_cards[0]]
     find_triple = [five_cards[0]]
     find_quadruple = [five_cards[0]]
     for c in range(1, len(five_cards)):
-        if five_cards[c].num == five_cards[c-1].num:
+        if five_cards[c].rank == five_cards[c-1].rank:
             find_pair.append(five_cards[c])
             find_triple.append(five_cards[c])
             find_quadruple.append(five_cards[c])
@@ -142,24 +142,24 @@ def cmp_five_cards(player_obj, cards = None):
                 find_quadruple = [five_cards[c]]
 
     if len(find_straight) == 4 and len(find_flush) == 4:
-        return STRAIGHTFLUSH, card_rank_weight[five_cards[4].num], card_suit_order[five_cards[4].suit]
+        return STRAIGHTFLUSH, card_rank_weight[five_cards[4].rank], card_suit_order[five_cards[4].suit]
     elif len(find_straight) == 4:
-        return STRAIGHT, card_rank_weight[five_cards[4].num], card_suit_order[five_cards[4].suit]
+        return STRAIGHT, card_rank_weight[five_cards[4].rank], card_suit_order[five_cards[4].suit]
     elif len(find_flush) == 4:
-        return FLUSH, card_rank_weight[five_cards[4].num], card_suit_order[five_cards[4].suit]
+        return FLUSH, card_rank_weight[five_cards[4].rank], card_suit_order[five_cards[4].suit]
 
     elif len(find_quadruple) == 4:
-        return QUADRUPLE, card_rank_weight[find_quadruple[3].num], card_suit_order[find_quadruple[3].suit]
+        return QUADRUPLE, card_rank_weight[find_quadruple[3].rank], card_suit_order[find_quadruple[3].suit]
     elif len(find_triple) == 3 and len(find_pair) >= 4:
-        return FULLHOUSE, card_rank_weight[find_triple[2].num], card_suit_order[find_triple[2].suit]
+        return FULLHOUSE, card_rank_weight[find_triple[2].rank], card_suit_order[find_triple[2].suit]
     elif len(find_triple) == 3:
-        return TRIPLE, card_rank_weight[find_triple[2].num], card_suit_order[find_triple[2].suit]
+        return TRIPLE, card_rank_weight[find_triple[2].rank], card_suit_order[find_triple[2].suit]
     elif len(find_pair) == 4:
-        return TWOPAIR, card_rank_weight[find_pair[3].num], card_suit_order[find_pair[3].suit]
+        return TWOPAIR, card_rank_weight[find_pair[3].rank], card_suit_order[find_pair[3].suit]
     elif len(find_pair) == 2 or len(find_pair) == 3:
-        return ONEPAIR, card_rank_weight[find_pair[1].num], card_suit_order[find_pair[1].suit]
+        return ONEPAIR, card_rank_weight[find_pair[1].rank], card_suit_order[find_pair[1].suit]
     else:
-        return NOPAIR, card_rank_weight[five_cards[4].num], card_suit_order[five_cards[4].suit]
+        return NOPAIR, card_rank_weight[five_cards[4].rank], card_suit_order[five_cards[4].suit]
 
 cmp_func_map = {
     1: cmp_one_card,
