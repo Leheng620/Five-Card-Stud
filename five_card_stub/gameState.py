@@ -4,7 +4,7 @@ from random import shuffle
 from collections import deque
 
 class GameState:
-    def __init__(self, n_players=2, balance=100):
+    def __init__(self, n_players=2, balance=100, ante=5):
         '''
         round:          rounds of card dealing so far
                         round 0 => two cards each player
@@ -27,11 +27,10 @@ class GameState:
         shuffle(self.card_stack)
         self.print_card_stack()
 
-        self.initializePlayers(balance)
+        self.initializePlayers(balance, ante)
         self.first_player = 0
 
-    
-    def initializePlayers(self, balance):
+    def initializePlayers(self, balance, ante):
         '''
         Deal two cards to each player, and initialize the players array
         '''
@@ -40,7 +39,7 @@ class GameState:
             for i in self.alive_indices:
                 top_card = self.card_stack.popleft()
                 init_card_pairs[i].append(top_card)
-        self.players = [Agent(balance, i, card_pair, 0, True) for i, card_pair in enumerate(init_card_pairs)]
+        self.players = [Agent(balance-ante, i, card_pair, ante, True) for i, card_pair in enumerate(init_card_pairs)]
 
     def deal(self):
         '''
@@ -95,6 +94,7 @@ class GameState:
         elif action == Actions.RAISE:
             self.total_chips += raise_chip
 
+# Functions for debugging
     def print_cards(self):
         '''
         Helper function for debugging
