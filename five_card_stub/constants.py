@@ -66,5 +66,6 @@ card_type_map = {
 
 class Actions:
     FOLD = 0
-    CHECK = 1
+    CHECK = 1 # Also means CALL (a player matches the amount that has been put in)
     RAISE = 2
+    ALL_IN = 3
