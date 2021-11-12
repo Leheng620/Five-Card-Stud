@@ -22,6 +22,9 @@ class Card():
             return card_suit_order[self.suit] < card_suit_order[other.suit]
         return False
 
+    def __str__(self):
+        return chr(suit_character[self.suit]) + (rank_character[str(self.rank)])
+
 def match_num_to_card(num):
     '''
     Convert a number(1-52) into a Card object.
@@ -46,7 +49,7 @@ def match_card_to_num(card):
     return num
 
 def create_half_deck():
-    return [Card(j, i) for j in ['brick', 'club', 'heart', 'blade'] for i in [1,8,9,10,11,12,13]]
+    return [Card(j, i) for j in ['diamonds', 'clubs', 'hearts', 'spades'] for i in [1,8,9,10,11,12,13]]
 
 # -------------------sort functions---------------------
 # Sort each player object based on their card type. These functions are passed as "key" in the sort function.
