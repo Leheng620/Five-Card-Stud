@@ -12,7 +12,9 @@ class GameState:
         players:        all the players
         alive_indices:  indecies of players still alive, initially [0, n_players-1]
         player_queue:   queue of players indices (in the order of play in the current betting round)
-        total_chips:    the total number of chips on the table
+        total_chips:    the total number of chips on the table (including chips put in by both alive or not alive players)
+        max_chips:      the maximum number of chips put in among all the players, other (alive) players have to 
+                        put in the same number (in total) to stay alive
         card_stack:     cards in the heap, shuffled
         first_player:   Index of the player with best cards (among the alive players), 
                         betting & dealling start from this player
@@ -23,14 +25,14 @@ class GameState:
         self.alive_indices = list(range(n_players))
         self.player_queue = deque()
         self.total_chips = 0
+        self.max_chips = 0
         self.card_stack = deque(create_half_deck())
         shuffle(self.card_stack)
         self.print_card_stack()
-
         self.initializePlayers(balance, ante)
         self.first_player = 0
 
-    def initializePlayers(self, balance, ante):
+    def initializePlayers(self, balance, ante) -> None:
         '''
         Deal two cards to each player, and initialize the players array
         '''
@@ -41,7 +43,7 @@ class GameState:
                 init_card_pairs[i].append(top_card)
         self.players = [Agent(balance-ante, i, card_pair, ante, True) for i, card_pair in enumerate(init_card_pairs)]
 
-    def deal(self):
+    def deal(self) -> None:
         '''
         Deal one card to each alive player, increment the round count
         '''
@@ -53,13 +55,13 @@ class GameState:
         
         self.round += 1
 
-    def get_next_player(self):
+    def get_next_player(self) -> Agent:
         player_idx = self.player_queue.popleft()
         self.player_queue.append(player_idx)
 
         return self.players[player_idx]
     
-    def build_player_queue(self):
+    def build_player_queue(self) -> None:
         '''
         Compare revealed cards and return the player with best card
         '''
@@ -68,15 +70,22 @@ class GameState:
         self.first_player = alive_p[-1].index
         self.player_queue.extend(self.alive_indices[self.first_player:] + self.alive_indices[:self.first_player])
     
-    def get_player_queue(self):
-        return self.player_queue
-    
     def clear_player_queue(self):
         self.player_queue.clear()
 
-    def get_alive_players(self):
-        return [self.players[i] for i in self.alive_indices]
+    # Interface provided to the agent
+    def player_act(self, player_id, action, raise_chip=0):
+        if action == Actions.FOLD:
+            self.alive_indices.remove(player_id)
+            return
+        elif action == Actions.RAISE or action == Actions.ALL_IN:
+            self.max_chips += raise_chip
+        
+        # self.total_chips +=
+         
 
+
+    # Conditions for a round/game to end
     def is_round_end(self):
         if len(self.get_alive_players()) < 2:
             return True
@@ -88,13 +97,15 @@ class GameState:
     def is_game_end(self):
         return self.round == 4 or len(self.alive_indices) < 2
 
-    def player_act(self, player_id, action, raise_chip=0):
-        if action == Actions.FOLD:
-            self.alive_indices.remove(player_id)
-        elif action == Actions.RAISE:
-            self.total_chips += raise_chip
 
-# Functions for debugging
+    # Get methods
+    def get_player_queue(self):
+        return self.player_queue
+
+    def get_alive_players(self):
+        return [self.players[i] for i in self.alive_indices]
+
+    # Functions for debugging
     def print_cards(self):
         '''
         Helper function for debugging

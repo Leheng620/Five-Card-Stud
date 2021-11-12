@@ -31,6 +31,11 @@ class Agent(AbstractPlayer):
         elif action == Actions.RAISE:
             self.balance -= raise_chip
             self.chip += raise_chip
+        elif action == Actions.ALL_IN:
+            raise_chip = self.balance
+            self.balance -= raise_chip
+            self.chip += raise_chip
+
 
         game.player_act(self.index, action, raise_chip)
         self.last_action = action
