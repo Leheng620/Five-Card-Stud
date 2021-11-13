@@ -1,4 +1,5 @@
 import random
+import math
 
 # Map number(1-52) to 52 cards
 card_suit = {
@@ -69,3 +70,8 @@ class Actions:
     CHECK = 1 # Also means CALL (a player matches the amount that has been put in)
     RAISE = 2
     ALL_IN = 3
+
+# The constant in Node class
+class NodeMeta:
+    C = math.sqrt(2)
+    INF = math.inf
