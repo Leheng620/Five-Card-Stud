@@ -3,24 +3,47 @@ import math
 
 # Map number(1-52) to 52 cards
 card_suit = {
-    0: 'blade',
-    1: 'heart',
-    2: 'brick',
-    3: 'club',
+    0: 'spades',
+    1: 'hearts',
+    2: 'diamonds',
+    3: 'clubs',
 }
 card_rank = {
-    'blade': 0,
-    'heart': 1,
-    'brick': 2,
-    'club': 3,
+    'spades': 0,
+    'hearts': 1,
+    'diamonds': 2,
+    'clubs': 3,
+}
+
+# For displaying character use
+suit_character = {
+    'spades': 0x2660,
+    'hearts': 0x2665,
+    'diamonds': 0x2666,
+    'clubs': 0x2663
+}
+rank_character = {
+    '11': 'J',
+    '12': 'Q',
+    '13': 'K',
+    '1': 'A',
+    '2': '2',
+    '3': '3',
+    '4': '4',
+    '5': '5',
+    '6': '6',
+    '7': '7',
+    '8': '8',
+    '9': '9',
+    '10': '10'
 }
 
 # Define the weighting of each suit and each rank to be used for card comparison
 card_suit_order = {
-    'blade': 5,
-    'heart': 4,
-    'club': 3,
-    'brick': 2,
+    'spades': 5,
+    'hearts': 4,
+    'clubs': 3,
+    'diamonds': 2,
 }
 card_rank_weight = {
     1: 19,
@@ -38,8 +61,8 @@ card_rank_weight = {
     13: 18,
 }
 
-# full_deck = [Card(j, i) for j in ['brick', 'club', 'heart', 'blade'] for i in range(1, 14)]
-# half_deck = [Card(j, i) for j in ['brick', 'club', 'heart', 'blade'] for i in range(8, 14)]
+# full_deck = [Card(j, i) for j in ['diamonds', 'clubs', 'hearts', 'spades'] for i in range(1, 14)]
+# half_deck = [Card(j, i) for j in ['diamonds', 'clubs', 'hearts', 'spades'] for i in range(8, 14)]
 half_deck_count = 28
 # half_deck_index_map = {0: 0, 1: 1, 2: 2, 4: 3, 5: 4}
 

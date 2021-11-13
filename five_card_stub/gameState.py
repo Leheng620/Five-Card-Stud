@@ -113,7 +113,7 @@ class GameState:
         for p in self.players:
             print("Player %d" % p.index)
             for c in p.cards:
-                print(c.suit, c.rank, sep=', ', end='; ')
+                print(str(c), sep=', ', end='; ')
             print()
         print("------------------------------")
 
