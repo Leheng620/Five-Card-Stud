@@ -13,31 +13,53 @@ class AbstractPlayer:
         self.last_action = None
 
 
-class Agent(AbstractPlayer):
+class RandomAgent(AbstractPlayer):
 
     def __init__(self, balance, index, cards, chip, alive):
-        super(Agent, self).__init__(balance, index, cards, chip, alive)
+        super(RandomAgent, self).__init__(balance, index, cards, chip, alive)
 
-    def decide_action(self, game):
-        if self.index == 0 and self.last_action == Actions.CHECK:
-            return (Actions.RAISE, 1)
+    def decide_action(self, game, repeat):
+        '''
+        Should be overwritten by sub class
+        :param game: gameState object
+        :param repeat: see game.py
+        :return: Action, raise_chip
+        '''
+        raise_chip = 0
+        if repeat:
+            allow_actions = [Actions.FOLD, Actions.CALL]
+            action = random.choices(allow_actions, [1, 2])[0]
+
         else:
-            return (Actions.CHECK, 0)
+            if self.chip == game.current_max_chips:
+                allow_actions = [Actions.CHECK, Actions.FOLD, Actions.RAISE, Actions.ALL_IN]
+                action = random.choices(allow_actions, [10, 0, 3, 1])[0]
+            else:
+                allow_actions = [Actions.FOLD, Actions.CALL, Actions.RAISE, Actions.ALL_IN]
+                action = random.choices(allow_actions, [1, 8, 3, 1])[0]
+            if action == Actions.RAISE:
+                raise_chip = 10
 
-    def play(self, game):
-        action, raise_chip = self.decide_action(game)
+        return action, raise_chip
+
+    def play(self, game, repeat):
+        action, raise_chip = self.decide_action(game, repeat)
         if action == Actions.FOLD:
             self.alive = False
         elif action == Actions.RAISE:
             self.balance -= raise_chip
             self.chip += raise_chip
         elif action == Actions.ALL_IN:
-            raise_chip = self.balance
+            raise_chip = game.max_chips - self.chip
+            self.balance -= raise_chip
+            self.chip += raise_chip
+        elif action == Actions.CALL:
+            raise_chip = game.current_max_chips - self.chip
             self.balance -= raise_chip
             self.chip += raise_chip
 
-
         game.player_act(self.index, action, raise_chip)
+        print("[debug] player %d, action: %s, raise_chip: %d" % (self.index, action.name, raise_chip))
         self.last_action = action
     
     def append_card(self, card):

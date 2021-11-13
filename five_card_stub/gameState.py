@@ -1,6 +1,6 @@
-from agent import Agent
+from agent import RandomAgent
 from card import *
-from random import shuffle
+import random
 from collections import deque
 
 class GameState:
@@ -13,11 +13,14 @@ class GameState:
         alive_indices:  indecies of players still alive, initially [0, n_players-1]
         player_queue:   queue of players indices (in the order of play in the current betting round)
         total_chips:    the total number of chips on the table (including chips put in by both alive or not alive players)
-        max_chips:      the maximum number of chips put in among all the players, other (alive) players have to 
+        max_chips:      the maximum number of chips put in among all the players,
+        current_max_chips: The max chips on the table in the current round. If any player has chips that is less than
+                        current_max_chips, the player can call, raise, or fold, but can't check. Alive players have to
                         put in the same number (in total) to stay alive
-        card_stack:     cards in the heap, shuffled
+        used_cards:     The cards that have been dealt to players.
         first_player:   Index of the player with best cards (among the alive players), 
                         betting & dealling start from this player
+        ante:           The price of the entrance ticket
         '''
         self.round = 1
         self.n_players = n_players
@@ -26,22 +29,36 @@ class GameState:
         self.player_queue = deque()
         self.total_chips = 0
         self.max_chips = 0
-        self.card_stack = deque(create_half_deck())
-        shuffle(self.card_stack)
-        self.print_card_stack()
+        self.current_max_chips = 0
+        self.used_card = set()
         self.initializePlayers(balance, ante)
         self.first_player = 0
+        self.ante = ante
+        self.initialize_game_state()
 
     def initializePlayers(self, balance, ante) -> None:
         '''
-        Deal two cards to each player, and initialize the players array
+        Deal two cards to each player, and initialize the players array.
+        balance: initial balance each player has
+        ante: the price of the entrance ticket
         '''
         init_card_pairs = [[] for _ in range(self.n_players)]
         for _ in range(2):
             for i in self.alive_indices:
-                top_card = self.card_stack.popleft()
+                top_card = self.generate_random_card()
                 init_card_pairs[i].append(top_card)
-        self.players = [Agent(balance-ante, i, card_pair, ante, True) for i, card_pair in enumerate(init_card_pairs)]
+        self.players = [RandomAgent(balance-ante, i, card_pair, ante, True) for i, card_pair in enumerate(init_card_pairs)]
+
+    def initialize_game_state(self):
+        # The maximum chips players can bet (when all in) is the lowest balance a player has among all players.
+        self.max_chips = min([p.balance for p in self.players])
+
+        # The max chip in the current round is the price of the entrance ticket,
+        # which also equals to the chip each player has on table at the beginning
+        self.current_max_chips = self.ante
+
+        # the total chips of the game state at the beginning is the sum of entrance ticket
+        self.total_chips = self.ante * len(self.players)
 
     def deal(self) -> None:
         '''
@@ -50,12 +67,24 @@ class GameState:
         ordering = self.alive_indices[self.first_player:] + self.alive_indices[:self.first_player]
         for i in ordering:
             player = self.players[i]
-            top_card = self.card_stack.popleft()
+            top_card = self.generate_random_card()
             player.append_card(top_card)
         
         self.round += 1
 
-    def get_next_player(self) -> Agent:
+    def generate_random_card(self):
+        '''
+        Generate a random card from the remaining card deck. Then eliminate it from the remaining card deck.
+        :return: The random card generated.
+        '''
+
+        cards = create_half_deck()
+        generated_card = random.choice([card for card in cards if card not in self.used_card])
+        self.used_card.add(generated_card)
+        return generated_card
+
+
+    def get_next_player(self) -> RandomAgent:
         player_idx = self.player_queue.popleft()
         self.player_queue.append(player_idx)
 
@@ -79,7 +108,10 @@ class GameState:
             self.alive_indices.remove(player_id)
             return
         elif action == Actions.RAISE or action == Actions.ALL_IN:
-            self.max_chips += raise_chip
+            self.current_max_chips += raise_chip
+            self.total_chips += raise_chip
+        elif action == Actions.CALL:
+            self.total_chips += raise_chip
         
         # self.total_chips +=
          
@@ -87,15 +119,26 @@ class GameState:
 
     # Conditions for a round/game to end
     def is_round_end(self):
+        '''
+        The current round is not end only when there is player that does not have the same of amount of chips on table
+        as the current_max_chips, they still need to decide whether to fold or call.
+        '''
         if len(self.get_alive_players()) < 2:
             return True
         for p in self.get_alive_players():
-            if p.last_action != Actions.CHECK:
+            if p.chip != self.current_max_chips:
                 return False
         return True
 
     def is_game_end(self):
         return self.round == 4 or len(self.alive_indices) < 2
+
+    def get_winner(self):
+        alive_p = self.get_alive_players()
+        if len(alive_p) == 1:
+            return alive_p[0].index
+        alive_p.sort(key=cmp_func_map[5])
+        return alive_p[-1].index
 
 
     # Get methods
@@ -110,17 +153,13 @@ class GameState:
         '''
         Helper function for debugging
         '''
+        print("------------------------------")
         for p in self.players:
             print("Player %d" % p.index)
             for c in p.cards:
                 print(str(c), sep=', ', end='; ')
             print()
-        print("------------------------------")
 
-    def print_card_stack(self):
-        for c in self.card_stack:
-            print(c.suit, c.rank, sep=', ', end='; ')
-        print()
 
 
 

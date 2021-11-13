@@ -1,4 +1,5 @@
 import random
+from enum import Enum
 
 # Map number(1-52) to 52 cards
 card_suit = {
@@ -87,8 +88,9 @@ card_type_map = {
     STRAIGHTFLUSH: 'straight flush'
 }
 
-class Actions:
+class Actions(Enum):
     FOLD = 0
     CHECK = 1 # Also means CALL (a player matches the amount that has been put in)
     RAISE = 2
     ALL_IN = 3
+    CALL = 4

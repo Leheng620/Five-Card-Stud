@@ -22,6 +22,9 @@ class Card():
             return card_suit_order[self.suit] < card_suit_order[other.suit]
         return False
 
+    def __hash__(self):
+        return hash(self.suit) + hash(self.rank)
+
     def __str__(self):
         return chr(suit_character[self.suit]) + (rank_character[str(self.rank)])
 
@@ -119,7 +122,7 @@ def cmp_four_cards(player_obj, cards = None):
 
 def cmp_five_cards(player_obj, cards = None):
     if cards is None:
-        five_cards = [i for i in player_obj.revealed_cards] + [player_obj.__secret_card]
+        five_cards = [i for i in player_obj.cards]
     else:
         five_cards = cards.copy()
     five_cards.sort()

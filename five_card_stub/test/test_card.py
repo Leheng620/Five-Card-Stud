@@ -40,6 +40,9 @@ class CardTest(TestCase):
         for yi, y in zip(full_deck, sorted_card_list):
             TestCase.assertTrue(self, yi == y)
 
+    def test_card_hash(self):
+        full_deck = [Card(j, i) for j in ['diamonds', 'clubs', 'hearts', 'spades'] for i in range(1, 14)]
+        TestCase.assertEqual(self, len(set(full_deck)), len(full_deck))
 
 
 class CardTypeComparisonTest(TestCase):
