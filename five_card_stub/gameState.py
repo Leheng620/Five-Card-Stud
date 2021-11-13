@@ -75,10 +75,10 @@ class GameState:
 
     # Interface provided to the agent
     def player_act(self, player_id, action, raise_chip=0):
-        if action == Actions.FOLD:
+        if action == Action.FOLD:
             self.alive_indices.remove(player_id)
             return
-        elif action == Actions.RAISE or action == Actions.ALL_IN:
+        elif action == Action.RAISE or action == Action.ALL_IN:
             self.max_chips += raise_chip
         
         # self.total_chips +=
@@ -90,7 +90,7 @@ class GameState:
         if len(self.get_alive_players()) < 2:
             return True
         for p in self.get_alive_players():
-            if p.last_action != Actions.CHECK:
+            if p.last_action != Action.CHECK:
                 return False
         return True
 

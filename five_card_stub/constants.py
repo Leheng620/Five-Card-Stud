@@ -88,13 +88,26 @@ card_type_map = {
     STRAIGHTFLUSH: 'straight flush'
 }
 
-class Actions:
+class Action:
     FOLD = 0
     CHECK = 1 # Also means CALL (a player matches the amount that has been put in)
     RAISE = 2
     ALL_IN = 3
 
+POSSIBLE_ACTIONS = [
+    Action.FOLD, Action.CHECK, Action.RAISE, Action.ALL_IN
+]
+
+action_map = {
+    Action.FOLD: "fold",
+    Action.CHECK: "check",
+    Action.RAISE: "raise",
+    Action.ALL_IN: "all_in"
+}
+
 # The constant in Node class
 class NodeMeta:
     C = math.sqrt(2)
     INF = math.inf
+    RAISE_LIMIT = 2
+

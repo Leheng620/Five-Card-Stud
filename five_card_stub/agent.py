@@ -1,4 +1,4 @@
-from constants import Actions
+from constants import Action
 import random
 
 class AbstractPlayer:
@@ -20,12 +20,12 @@ class Agent(AbstractPlayer):
 
     def play(self, game):
         action, raise_chip = self.decide_action(game)
-        if action == Actions.FOLD:
+        if action == Action.FOLD:
             self.alive = False
-        elif action == Actions.RAISE:
+        elif action == Action.RAISE:
             self.balance -= raise_chip
             self.chip += raise_chip
-        elif action == Actions.ALL_IN:
+        elif action == Action.ALL_IN:
             raise_chip = self.balance
             self.balance -= raise_chip
             self.chip += raise_chip

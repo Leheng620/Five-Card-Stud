@@ -1,8 +1,8 @@
-from constants import NodeMeta
+from constants import NodeMeta, Action
 from math import sqrt, log
 
 class Node:
-    def __init__(self, action: tuple = None, parent: object = None):
+    def __init__(self, action: Action = None, parent: object = None, raise_limit = NodeMeta.RAISE_LIMIT, index=0, consecutive_checks=0):
         '''
         Args:
             action:     the action taken at the parent node (which leads to this node)
@@ -18,13 +18,16 @@ class Node:
         self.U = 0
         self.children = {}
         self.outcome = None
+        self.raise_limit = raise_limit
+        self.index = index
+        self.consecutive_checks = consecutive_checks
 
     def add_children(self, children: dict) -> None:
         '''
-        Mapping: action -> child
+        children: dict that maps action to child
         '''
-        for child in children:
-            self.children[child.action] = child
+        for action, child in children.items():
+            self.children[action] = child
     
     @property
     def value(self) -> float:
