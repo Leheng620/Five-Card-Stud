@@ -1,5 +1,6 @@
 import random
 from enum import Enum
+import math
 
 # Map number(1-52) to 52 cards
 card_suit = {
@@ -94,3 +95,10 @@ class Actions(Enum):
     RAISE = 2
     ALL_IN = 3
     CALL = 4
+
+# The constant in Node class
+class NodeMeta:
+    C = math.sqrt(2)
+    INF = math.inf
+    RAISE_LIMIT = 2
+

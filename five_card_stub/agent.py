@@ -25,6 +25,10 @@ class RandomAgent(AbstractPlayer):
         :param repeat: see game.py
         :return: Action, raise_chip
         '''
+        # all alive players have all-in
+        if self.chip == game.max_chips:
+            return Actions.CHECK, 0
+
         raise_chip = 0
         if repeat:
             allow_actions = [Actions.FOLD, Actions.CALL]
@@ -34,31 +38,41 @@ class RandomAgent(AbstractPlayer):
             if self.chip == game.current_max_chips:
                 allow_actions = [Actions.CHECK, Actions.FOLD, Actions.RAISE, Actions.ALL_IN]
                 action = random.choices(allow_actions, [10, 0, 3, 1])[0]
-            else:
+            elif game.current_max_chips == game.current_max_chips: # there are players have all-in
+                allow_actions = [Actions.FOLD, Actions.CALL]
+                action = random.choices(allow_actions, [2, 3])[0]
+            else: # there are players have raised
                 allow_actions = [Actions.FOLD, Actions.CALL, Actions.RAISE, Actions.ALL_IN]
                 action = random.choices(allow_actions, [1, 8, 3, 1])[0]
+
             if action == Actions.RAISE:
-                raise_chip = 10
+                raise_chip = 10 # fix the raised amount
 
         return action, raise_chip
 
     def play(self, game, repeat):
         action, raise_chip = self.decide_action(game, repeat)
+
+        # the difference between the amount of chip a player has and the current max chip on table
+        chip_diff = game.current_max_chips - self.chip
         if action == Actions.FOLD:
             self.alive = False
         elif action == Actions.RAISE:
-            self.balance -= raise_chip
-            self.chip += raise_chip
+            # RAISE + CALL/CHECK
+            # raised amount + the amount other players have raised in the current round
+            chip_diff = raise_chip + chip_diff
+            self.balance -= chip_diff
+            self.chip += chip_diff
         elif action == Actions.ALL_IN:
-            raise_chip = game.max_chips - self.chip
-            self.balance -= raise_chip
-            self.chip += raise_chip
+            raise_chip = game.max_chips - game.current_max_chips
+            chip_diff = raise_chip + chip_diff
+            self.balance -= chip_diff
+            self.chip += chip_diff
         elif action == Actions.CALL:
-            raise_chip = game.current_max_chips - self.chip
-            self.balance -= raise_chip
-            self.chip += raise_chip
+            self.balance -= chip_diff
+            self.chip += chip_diff
 
-        game.player_act(self.index, action, raise_chip)
+        game.player_act(self.index, action, raise_chip, chip_diff)
         print("[debug] player %d, action: %s, raise_chip: %d" % (self.index, action.name, raise_chip))
         self.last_action = action
     

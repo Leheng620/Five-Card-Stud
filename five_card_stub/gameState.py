@@ -13,9 +13,9 @@ class GameState:
         alive_indices:  indecies of players still alive, initially [0, n_players-1]
         player_queue:   queue of players indices (in the order of play in the current betting round)
         total_chips:    the total number of chips on the table (including chips put in by both alive or not alive players)
-        max_chips:      the maximum number of chips put in among all the players,
+        max_chips:      the maximum number of chips can be put in by a player (the all-in amount)
         current_max_chips: The max chips on the table in the current round. If any player has chips that is less than
-                        current_max_chips, the player can call, raise, or fold, but can't check. Alive players have to
+                        current_max_chips, the player can't check. Alive players have to
                         put in the same number (in total) to stay alive
         used_cards:     The cards that have been dealt to players.
         first_player:   Index of the player with best cards (among the alive players), 
@@ -31,12 +31,12 @@ class GameState:
         self.max_chips = 0
         self.current_max_chips = 0
         self.used_card = set()
-        self.initializePlayers(balance, ante)
-        self.first_player = 0
         self.ante = ante
+        self.first_player = 0
+        self.initializePlayers(balance)
         self.initialize_game_state()
 
-    def initializePlayers(self, balance, ante) -> None:
+    def initializePlayers(self, balance) -> None:
         '''
         Deal two cards to each player, and initialize the players array.
         balance: initial balance each player has
@@ -47,10 +47,10 @@ class GameState:
             for i in self.alive_indices:
                 top_card = self.generate_random_card()
                 init_card_pairs[i].append(top_card)
-        self.players = [RandomAgent(balance-ante, i, card_pair, ante, True) for i, card_pair in enumerate(init_card_pairs)]
+        self.players = [RandomAgent(balance, i, card_pair, 0, True) for i, card_pair in enumerate(init_card_pairs)]
 
     def initialize_game_state(self):
-        # The maximum chips players can bet (when all in) is the lowest balance a player has among all players.
+        # The maximum chips players can put in (when all in) is the lowest balance a player has among all players.
         self.max_chips = min([p.balance for p in self.players])
 
         # The max chip in the current round is the price of the entrance ticket,
@@ -59,6 +59,15 @@ class GameState:
 
         # the total chips of the game state at the beginning is the sum of entrance ticket
         self.total_chips = self.ante * len(self.players)
+
+        self.pay_entrance_ticket()
+
+    def pay_entrance_ticket(self):
+        for i, p in enumerate(self.players):
+            if p.balance < self.ante:
+                raise Exception("Player %d does not have enough balance to play." % i)
+            p.balance -= self.ante
+            p.chip += self.ante
 
     def deal(self) -> None:
         '''
@@ -103,15 +112,16 @@ class GameState:
         self.player_queue.clear()
 
     # Interface provided to the agent
-    def player_act(self, player_id, action, raise_chip=0):
+    def player_act(self, player_id, action, raise_chip, chip_diff):
         if action == Actions.FOLD:
             self.alive_indices.remove(player_id)
             return
         elif action == Actions.RAISE or action == Actions.ALL_IN:
             self.current_max_chips += raise_chip
-            self.total_chips += raise_chip
+            self.total_chips += chip_diff
         elif action == Actions.CALL:
-            self.total_chips += raise_chip
+            self.total_chips += chip_diff
+
         
         # self.total_chips +=
          

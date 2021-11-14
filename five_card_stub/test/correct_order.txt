@@ -1,0 +1,100 @@
+1.
+------------------------------
+Player 0
+♦10; ♥10;
+Player 1
+♦K; ♣8;
+[debug] player 0, action: RAISE, raise_chip: 10
+[debug] total_chips: 20 current_max_chips: 15 player: 0 balance: 85
+[debug] player 1, action: RAISE, raise_chip: 10
+[debug] total_chips: 40 current_max_chips: 25 player: 1 balance: 75
+[debug] player 0, action: CALL, raise_chip: 0
+[debug] total_chips: 50 current_max_chips: 25 player: 0 balance: 75
+------------------------------
+Player 0
+♦10; ♥10; ♥9;
+Player 1
+♦K; ♣8; ♦8;
+[debug] player 1, action: CHECK, raise_chip: 0
+[debug] total_chips: 50 current_max_chips: 25 player: 1 balance: 75
+[debug] player 0, action: RAISE, raise_chip: 10
+[debug] total_chips: 60 current_max_chips: 35 player: 0 balance: 65
+[debug] player 1, action: CALL, raise_chip: 0
+[debug] total_chips: 70 current_max_chips: 35 player: 1 balance: 65
+------------------------------
+Player 0
+♦10; ♥10; ♥9; ♣9;
+Player 1
+♦K; ♣8; ♦8; ♠A;
+[debug] player 0, action: CHECK, raise_chip: 0
+[debug] total_chips: 70 current_max_chips: 35 player: 0 balance: 65
+[debug] player 1, action: RAISE, raise_chip: 10
+[debug] total_chips: 80 current_max_chips: 45 player: 1 balance: 55
+[debug] player 0, action: FOLD, raise_chip: 0
+[debug] total_chips: 80 current_max_chips: 45 player: 0 balance: 65
+winner: player 1
+
+Process finished with exit code 0
+
+##############################################################################################################
+
+2.
+------------------------------
+Player 0
+♦10; ♣K;
+Player 1
+♠9; ♦Q;
+[debug] player 0, action: ALL_IN, raise_chip: 95
+[debug] total_chips: 105 current_max_chips: 100 player: 0 balance: 0
+[debug] player 1, action: FOLD, raise_chip: 0
+[debug] total_chips: 105 current_max_chips: 100 player: 1 balance: 95
+winner: player 0
+
+Process finished with exit code 0
+
+##############################################################################################################
+
+3.
+------------------------------
+Player 0
+♠10; ♣A;
+Player 1
+♥10; ♦Q;
+[debug] player 0, action: CHECK, raise_chip: 0
+[debug] total_chips: 10 current_max_chips: 5 player: 0 balance: 95
+[debug] player 1, action: CHECK, raise_chip: 0
+[debug] total_chips: 10 current_max_chips: 5 player: 1 balance: 95
+------------------------------
+Player 0
+♠10; ♣A; ♣J;
+Player 1
+♥10; ♦Q; ♣10;
+[debug] player 0, action: RAISE, raise_chip: 10
+[debug] total_chips: 20 current_max_chips: 15 player: 0 balance: 85
+[debug] player 1, action: CALL, raise_chip: 0
+[debug] total_chips: 30 current_max_chips: 15 player: 1 balance: 85
+------------------------------
+Player 0
+♠10; ♣A; ♣J; ♥9;
+Player 1
+♥10; ♦Q; ♣10; ♣9;
+[debug] player 0, action: CHECK, raise_chip: 0
+[debug] total_chips: 30 current_max_chips: 15 player: 0 balance: 85
+[debug] player 1, action: CHECK, raise_chip: 0
+[debug] total_chips: 30 current_max_chips: 15 player: 1 balance: 85
+------------------------------
+Player 0
+♠10; ♣A; ♣J; ♥9; ♦A;
+Player 1
+♥10; ♦Q; ♣10; ♣9; ♦J;
+[debug] player 0, action: CHECK, raise_chip: 0
+[debug] total_chips: 30 current_max_chips: 15 player: 0 balance: 85
+[debug] player 1, action: ALL_IN, raise_chip: 85
+[debug] total_chips: 115 current_max_chips: 100 player: 1 balance: 0
+[debug] player 0, action: FOLD, raise_chip: 0
+[debug] total_chips: 115 current_max_chips: 100 player: 0 balance: 85
+winner: player 1
+
+Process finished with exit code 0
+
+##############################################################################################################

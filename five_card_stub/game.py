@@ -8,10 +8,12 @@ def main():
     while True:
         game.print_cards()
         game.build_player_queue()
+
+        # the number of players that have not taken an action yet
         num_alive_players_been_processed = len(game.alive_indices)
 
         # when repeat is True, every player has made an action, and all players has either raised or checked once, then
-        # the only action left for them is either fold or call. The idea is that every player can only make up to
+        # the only action left for them is either fold or call. The idea is that every player can only take up to
         # 2 actions in a single round
         repeat = False
         while True:
