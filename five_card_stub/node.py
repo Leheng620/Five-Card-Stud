@@ -1,33 +1,31 @@
-from constants import NodeMeta, Action
+from constants import NodeMeta, Actions
 from math import sqrt, log
 
 class Node:
-    def __init__(self, action: Action = None, parent: object = None, raise_limit = NodeMeta.RAISE_LIMIT, index=0, consecutive_checks=0):
+    def __init__(self, node_id: int, player_id: int, action: Actions = None, parent: object = None):
         '''
         Args:
             action:     the action taken at the parent node (which leads to this node)
             parent:     parent node
             N:          exploration count, the number of simulations that was applied to this node
             U:          the number of wins during past simulations 
-            children:   the children mapping: action -> child
+            children:   children of this node; will be added when this node is expanded in Monte-Carlo Tree
             outcome:    the winner of this node when the node is a leaf node; otherwise, None
         '''
+        self.node_id = node_id
+        self.player_id = player_id
         self.action = action
         self.parent = parent
         self.N = 0
         self.U = 0
-        self.children = {}
+        self.children = {}  
         self.outcome = None
-        self.raise_limit = raise_limit
-        self.index = index
-        self.consecutive_checks = consecutive_checks
 
-    def add_children(self, children: dict) -> None:
+    def add_child(self, action, child) -> None:
         '''
-        children: dict that maps action to child
+        Append to self.children
         '''
-        for action, child in children.items():
-            self.children[action] = child
+        self.children[action] = child
     
     @property
     def value(self) -> float:

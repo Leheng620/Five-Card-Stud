@@ -91,12 +91,12 @@ card_type_map = {
 
 class Actions(Enum):
     FOLD = 0
-    CHECK = 1 # Also means CALL (a player matches the amount that has been put in)
+    CHECK = 1
     RAISE = 2
     ALL_IN = 3
     CALL = 4
 
-# The constant in Node class
+# The constants in Node class
 class NodeMeta:
     C = math.sqrt(2)
     INF = math.inf

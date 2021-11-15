@@ -2,9 +2,10 @@ from agent import RandomAgent
 from card import *
 import random
 from collections import deque
+from mctsAgent import MCTSAgent
 
 class GameState:
-    def __init__(self, n_players=2, balance=100, ante=5):
+    def __init__(self, n_players=2, balance=100, ante=5, algorithm="random"):
         '''
         round:          rounds of card dealing so far
                         round 0 => two cards each player
@@ -21,22 +22,31 @@ class GameState:
         first_player:   Index of the player with best cards (among the alive players), 
                         betting & dealling start from this player
         ante:           The price of the entrance ticket
+        repeat:         Bool. repeat is set to False at the beginning of each betting round;
+                        set to True when all the players has been processed once
+        num_alive_players_not_been_processed:     
+                        the number of players that have not taken an action yet
         '''
         self.round = 1
         self.n_players = n_players
         self.players = None
         self.alive_indices = list(range(n_players))
-        self.player_queue = deque()
         self.total_chips = 0
         self.max_chips = 0
-        self.current_max_chips = 0
         self.used_card = set()
         self.ante = ante
+        self.current_max_chips = 0
+
+        # Info for betting round
+        self.player_queue = deque()
         self.first_player = 0
+        self.repeat = False
+        self.num_alive_players_not_been_processed = 0
+
         self.initializePlayers(balance)
         self.initialize_game_state()
 
-    def initializePlayers(self, balance) -> None:
+    def initializePlayers(self, balance, algorithm="random") -> None:
         '''
         Deal two cards to each player, and initialize the players array.
         balance: initial balance each player has
@@ -47,7 +57,10 @@ class GameState:
             for i in self.alive_indices:
                 top_card = self.generate_random_card()
                 init_card_pairs[i].append(top_card)
-        self.players = [RandomAgent(balance, i, card_pair, 0, True) for i, card_pair in enumerate(init_card_pairs)]
+        if algorithm == "mcts":
+            self.players = [MCTSAgent(balance, i, card_pair, 0, True) for i, card_pair in enumerate(init_card_pairs)]
+        else:
+            self.players = [RandomAgent(balance, i, card_pair, 0, True) for i, card_pair in enumerate(init_card_pairs)]
 
     def initialize_game_state(self):
         # The maximum chips players can put in (when all in) is the lowest balance a player has among all players.
@@ -92,6 +105,18 @@ class GameState:
         self.used_card.add(generated_card)
         return generated_card
 
+    # Interface for starting and ending a betting round
+
+    def start_betting_round(self):
+        self.build_player_queue()
+        self.repeat = False
+        self.num_alive_players_not_been_processed = len(self.alive_indices)
+    
+    def end_betting_round(self):
+        self.clear_player_queue()
+        self.clear_raise_flag()
+
+    # Utility functions for player queue
 
     def get_next_player(self) -> RandomAgent:
         player_idx = self.player_queue.popleft()
@@ -110,6 +135,10 @@ class GameState:
     
     def clear_player_queue(self):
         self.player_queue.clear()
+    
+    def clear_raise_flag(self):
+        for p in self.get_alive_players():
+            p.has_raised = False
 
     # Interface provided to the agent
     def player_act(self, player_id, action, raise_chip, chip_diff):
@@ -121,20 +150,35 @@ class GameState:
             self.total_chips += chip_diff
         elif action == Actions.CALL:
             self.total_chips += chip_diff
-
-        
-        # self.total_chips +=
          
-
+        self.num_alive_players_not_been_processed -= 1
 
     # Conditions for a round/game to end
     def is_round_end(self):
         '''
         The current round is not end only when there is player that does not have the same of amount of chips on table
         as the current_max_chips, they still need to decide whether to fold or call.
+
+        When repeat is True, every player has made an action, and all players has either raised or checked once, then
+        the only action left for them is either fold or call. The idea is that every player can only take up to
+        2 actions in a single round
         '''
-        if len(self.get_alive_players()) < 2:
+        if len(self.alive_indices) < 2:
             return True
+        elif self.num_alive_players_not_been_processed > 0 and self.repeat:
+            if self.has_player_not_decide():
+                return True
+        elif self.num_alive_players_not_been_processed == 0 and self.repeat:
+            return True
+        elif self.num_alive_players_not_been_processed == 0 and not self.repeat:
+            if self.has_player_not_decide():
+                return True
+            else:
+                self.repeat = True
+                self.num_alive_players_not_been_processed = len(self.alive_indices)
+        return False
+        
+    def has_player_not_decide(self):
         for p in self.get_alive_players():
             if p.chip != self.current_max_chips:
                 return False

@@ -10,15 +10,13 @@ class AbstractPlayer:
         self.revealed_cards = cards[1:] # the cards being revealed to other players
         self.chip = chip # current chip the player has raised
         self.alive = alive
-        self.last_action = None
-
 
 class RandomAgent(AbstractPlayer):
 
     def __init__(self, balance, index, cards, chip, alive):
         super(RandomAgent, self).__init__(balance, index, cards, chip, alive)
 
-    def decide_action(self, game, repeat):
+    def decide_action(self, game):
         '''
         Should be overwritten by sub class
         :param game: gameState object
@@ -30,7 +28,7 @@ class RandomAgent(AbstractPlayer):
             return Actions.CHECK, 0
 
         raise_chip = 0
-        if repeat:
+        if game.repeat:
             allow_actions = [Actions.FOLD, Actions.CALL]
             action = random.choices(allow_actions, [1, 2])[0]
 
@@ -50,8 +48,8 @@ class RandomAgent(AbstractPlayer):
 
         return action, raise_chip
 
-    def play(self, game, repeat):
-        action, raise_chip = self.decide_action(game, repeat)
+    def play(self, game):
+        action, raise_chip = self.decide_action(game)
 
         # the difference between the amount of chip a player has and the current max chip on table
         chip_diff = game.current_max_chips - self.chip
@@ -74,7 +72,7 @@ class RandomAgent(AbstractPlayer):
 
         game.player_act(self.index, action, raise_chip, chip_diff)
         print("[debug] player %d, action: %s, raise_chip: %d" % (self.index, action.name, raise_chip))
-        self.last_action = action
+        
     
     def append_card(self, card):
         self.cards.append(card)
