@@ -36,7 +36,7 @@ class RandomAgent(AbstractPlayer):
             if self.chip == game.current_max_chips:
                 allow_actions = [Actions.CHECK, Actions.FOLD, Actions.RAISE, Actions.ALL_IN]
                 action = random.choices(allow_actions, [10, 0, 3, 1])[0]
-            elif game.current_max_chips == game.current_max_chips: # there are players have all-in
+            elif game.current_max_chips == game.max_chips: # there are players have all-in
                 allow_actions = [Actions.FOLD, Actions.CALL]
                 action = random.choices(allow_actions, [2, 3])[0]
             else: # there are players have raised
@@ -83,15 +83,4 @@ class RandomAgent(AbstractPlayer):
         self.cards.append(card)
         self.revealed_cards = self.cards[1:]
     
-    def get_allow_actions(self, game):
-        if game.repeat:
-            return [Actions.FOLD, Actions.CALL]
-        else:
-            if self.chip == game.current_max_chips:
-                return [Actions.CHECK, Actions.FOLD, Actions.RAISE, Actions.ALL_IN]
-            elif game.current_max_chips == game.current_max_chips: # there are players have all-in
-                return [Actions.FOLD, Actions.CALL]
-            else: # there are players have raised
-                return [Actions.FOLD, Actions.CALL, Actions.RAISE, Actions.ALL_IN]
-
 

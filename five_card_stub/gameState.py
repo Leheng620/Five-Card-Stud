@@ -126,9 +126,17 @@ class GameState:
 
     # Utility functions for player queue
     def get_current_player(self) -> RandomAgent:
+        '''
+        Return the current player
+        '''
         return self.players[self.curr_player]
 
     def pop_get_next_player(self) -> RandomAgent:
+        '''
+        Pop next player from qeueu and append it at the end
+        (Update the current player)
+        Return the next player
+        '''
         player_idx = self.player_queue.popleft()
         self.curr_player = player_idx
         self.player_queue.append(player_idx)
@@ -137,7 +145,7 @@ class GameState:
 
     def get_next_player(self) -> RandomAgent:
         '''
-        return the first player in the queue without modifying the queue
+        Return the first player in the queue without modifying the queue
         '''
         return self.players[self.player_queue[0]]
     
@@ -206,6 +214,18 @@ class GameState:
             if p.chip != self.current_max_chips:
                 return False
         return True
+
+    def get_allow_actions(self, player):
+        if self.repeat:
+            return [Actions.FOLD, Actions.CALL]
+        else:
+            if player.chip == self.current_max_chips:
+                return [Actions.FOLD, Actions.CHECK, Actions.RAISE, Actions.ALL_IN]
+            elif self.current_max_chips == self.max_chips: # there are players have all-in
+                return [Actions.FOLD, Actions.CALL]
+            else: # there are players have raised
+                return [Actions.FOLD, Actions.CALL, Actions.RAISE, Actions.ALL_IN]
+
 
     def is_game_end(self):
         return self.round == 4 or len(self.alive_indices) < 2

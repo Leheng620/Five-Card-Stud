@@ -32,11 +32,10 @@ class MCTSAgent(RandomAgent):
         return action, raise_chip
 
     def build_tree(self, state, node):
-        possible_actions = list(Actions)
-        allow_actions = state.get_current_player().get_allow_actions(state)
+        allow_actions = state.get_allow_actions(state.get_current_player())
         
         print("-------------------------------------------------------")
-        print("[Expand] node:", node.node_id, "player:", node.player_id)
+        print("[Expand] node:", node.node_id, ", player:", node.player_id, ", allow_actions:", allow_actions)
         for action in allow_actions:
             # Update state: next_player act
             new_state = state.copyGameState()       # next_player will act on a copy of the current state
@@ -47,9 +46,9 @@ class MCTSAgent(RandomAgent):
             self.node_count += 1
             child = Node(self.node_count, next_player.index, action, node, new_state)
             node.add_child(action, child)
-            print("[New Child] parent:", node.node_id, "action:", action, "child:", child.node_id)
+            print("[New Child] parent:", node.node_id, ", action:", action, ", child:", child.node_id)
 
-            time.sleep(1)
+            # time.sleep(1)
 
             if new_state.is_round_end():
                 if new_state.is_game_end():
@@ -60,9 +59,7 @@ class MCTSAgent(RandomAgent):
                 else:
                     # Game continues, directly enter next betting round and build tree
                     child.mark_deal_needed()  # Mark deal is needed at this node in simulation
-                    # new_state.round += 1
-                    # new_state.start_betting_round()
-                    # self.build_tree(new_state, child, next_player)
+                    print("***[Round End] node: %d" % (child.node_id))
             else:
                 self.build_tree(new_state, child)
             
