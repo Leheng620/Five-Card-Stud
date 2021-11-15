@@ -49,8 +49,14 @@ class RandomAgent(AbstractPlayer):
         return action, raise_chip
 
     def play(self, game):
-        action, raise_chip = self.decide_action(game)
+        '''
+        Decide an action and act it
+        '''
+        action_tup = self.decide_action(game)
+        self.act(game, action_tup)
 
+    def act(self, game, action_tup):
+        action, raise_chip = action_tup
         # the difference between the amount of chip a player has and the current max chip on table
         chip_diff = game.current_max_chips - self.chip
         if action == Actions.FOLD:
@@ -71,9 +77,8 @@ class RandomAgent(AbstractPlayer):
             self.chip += chip_diff
 
         game.player_act(self.index, action, raise_chip, chip_diff)
-        print("[debug] player %d, action: %s, raise_chip: %d" % (self.index, action.name, raise_chip))
-        
-    
+        print("[player.act] player %d, action: %s, raise_chip: %d, chip_diff: %d, self.chip: %d" % (self.index, action.name, raise_chip, chip_diff, self.chip))
+
     def append_card(self, card):
         self.cards.append(card)
         self.revealed_cards = self.cards[1:]

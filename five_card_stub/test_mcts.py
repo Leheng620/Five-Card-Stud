@@ -6,11 +6,10 @@ from card import *
 def main():
     game = GameState(algorithm="mcts")
     game.print_cards()
-    game.build_player_queue()
+    game.start_betting_round()
 
-    repeat = False
     player = game.get_next_player()
-    player.play(game, repeat)
+    player.play(game)
     print("[debug] total_chips:", game.total_chips, "current_max_chips:",game.current_max_chips,
             "player:", player.index, "balance:", player.balance)
            

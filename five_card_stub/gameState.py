@@ -3,6 +3,7 @@ from card import *
 import random
 from collections import deque
 from mctsAgent import MCTSAgent
+from copy import deepcopy
 
 class GameState:
     def __init__(self, n_players=2, balance=100, ante=5, algorithm="random"):
@@ -43,8 +44,15 @@ class GameState:
         self.repeat = False
         self.num_alive_players_not_been_processed = 0
 
-        self.initializePlayers(balance)
+        self.initializePlayers(balance, algorithm=algorithm)
         self.initialize_game_state()
+
+    def copyGameState(self):
+        new_state = deepcopy(self)
+        for i in range(self.n_players):
+            new_state.players[i] = deepcopy(self.players[i])
+        return new_state
+
 
     def initializePlayers(self, balance, algorithm="random") -> None:
         '''
@@ -123,6 +131,12 @@ class GameState:
         self.player_queue.append(player_idx)
 
         return self.players[player_idx]
+
+    def get_next_player_without_pop(self) -> RandomAgent:
+        '''
+        return the first player in the queue without modifying the queue
+        '''
+        return self.players[self.player_queue[0]]
     
     def build_player_queue(self) -> None:
         '''
@@ -152,6 +166,7 @@ class GameState:
             self.total_chips += chip_diff
          
         self.num_alive_players_not_been_processed -= 1
+        print("[gameState.player_act] current_max_chip: %d" % self.current_max_chips)
 
     # Conditions for a round/game to end
     def is_round_end(self):
@@ -163,24 +178,29 @@ class GameState:
         the only action left for them is either fold or call. The idea is that every player can only take up to
         2 actions in a single round
         '''
+        print("[Is_round_end] repeat: %d, num_alive_players_not_been_processed: %d" % (self.repeat, self.num_alive_players_not_been_processed))
         if len(self.alive_indices) < 2:
             return True
         elif self.num_alive_players_not_been_processed > 0 and self.repeat:
-            if self.has_player_not_decide():
+            if self.all_alive_player_has_decided():
                 return True
         elif self.num_alive_players_not_been_processed == 0 and self.repeat:
             return True
         elif self.num_alive_players_not_been_processed == 0 and not self.repeat:
-            if self.has_player_not_decide():
+            if self.all_alive_player_has_decided():
                 return True
             else:
                 self.repeat = True
                 self.num_alive_players_not_been_processed = len(self.alive_indices)
         return False
         
-    def has_player_not_decide(self):
+    def all_alive_player_has_decided(self):
+        '''
+        Return true if all the alive player has been asked once; false otherwise
+        '''
         for p in self.get_alive_players():
             if p.chip != self.current_max_chips:
+                print("[Comparing player's chip with max_current_chip] %d, %d", p.chip, self.current_max_chips)
                 return False
         return True
 
