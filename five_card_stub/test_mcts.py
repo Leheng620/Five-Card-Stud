@@ -8,7 +8,7 @@ def main():
     game.print_cards()
     game.start_betting_round()
 
-    player = game.get_next_player()
+    player = game.pop_get_next_player()
     player.play(game)
     print("[debug] total_chips:", game.total_chips, "current_max_chips:",game.current_max_chips,
             "player:", player.index, "balance:", player.balance)

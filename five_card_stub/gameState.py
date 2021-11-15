@@ -40,7 +40,7 @@ class GameState:
 
         # Info for betting round
         self.player_queue = deque()
-        self.first_player = 0
+        self.curr_player = 0
         self.repeat = False
         self.num_alive_players_not_been_processed = 0
 
@@ -125,14 +125,17 @@ class GameState:
         self.clear_raise_flag()
 
     # Utility functions for player queue
+    def get_current_player(self) -> RandomAgent:
+        return self.players[self.curr_player]
 
-    def get_next_player(self) -> RandomAgent:
+    def pop_get_next_player(self) -> RandomAgent:
         player_idx = self.player_queue.popleft()
+        self.curr_player = player_idx
         self.player_queue.append(player_idx)
 
         return self.players[player_idx]
 
-    def get_next_player_without_pop(self) -> RandomAgent:
+    def get_next_player(self) -> RandomAgent:
         '''
         return the first player in the queue without modifying the queue
         '''
@@ -199,8 +202,8 @@ class GameState:
         Return true if all the alive player has been asked once; false otherwise
         '''
         for p in self.get_alive_players():
+            print("[Comparing player %d chip with max_current_chip] %d, %d" % (p.index, p.chip, self.current_max_chips))
             if p.chip != self.current_max_chips:
-                print("[Comparing player's chip with max_current_chip] %d, %d", p.chip, self.current_max_chips)
                 return False
         return True
 

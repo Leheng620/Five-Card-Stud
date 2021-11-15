@@ -20,7 +20,7 @@ class MCTSAgent(RandomAgent):
         self.root_state = deepcopy(game)                   # Deepcopy the current game state
         root_node = Node(self.node_count, self.index)      # Root Node: current game state
 
-        self.build_tree(self.root_state, root_node, self)
+        self.build_tree(self.root_state, root_node)
 
         # simulation and update the tree
         self.simulation() 
@@ -31,20 +31,19 @@ class MCTSAgent(RandomAgent):
         raise_chip = 10 if action == Actions.RAISE else 0
         return action, raise_chip
 
-    def build_tree(self, state, node, curr_player):
+    def build_tree(self, state, node):
         possible_actions = list(Actions)
-        if state.repeat:
-            possible_actions = [Actions.FOLD, Actions.CALL]
+        allow_actions = state.get_current_player().get_allow_actions(state)
         
         print("-------------------------------------------------------")
         print("[Expand] node:", node.node_id, "player:", node.player_id)
-
-        for action in possible_actions:
+        for action in allow_actions:
             # Update state: next_player act
             new_state = state.copyGameState()       # next_player will act on a copy of the current state
             action_tup = (action, 10 if action == Actions.RAISE else 0)
+            curr_player = new_state.get_current_player()
             curr_player.act(new_state, action_tup)
-            next_player = new_state.get_next_player()
+            next_player = new_state.pop_get_next_player()
             self.node_count += 1
             child = Node(self.node_count, next_player.index, action, node, new_state)
             node.add_child(action, child)
@@ -65,7 +64,7 @@ class MCTSAgent(RandomAgent):
                     # new_state.start_betting_round()
                     # self.build_tree(new_state, child, next_player)
             else:
-                self.build_tree(new_state, child, next_player)
+                self.build_tree(new_state, child)
             
             print()
 
