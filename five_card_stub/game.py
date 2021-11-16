@@ -4,7 +4,7 @@ from card import *
 
 
 def main():
-    game = GameState()
+    game = GameState(algorithm="mcts")
     while True:
         game.print_cards()
         game.start_betting_round()

@@ -177,7 +177,6 @@ class GameState:
             self.total_chips += chip_diff
          
         self.num_alive_players_not_been_processed -= 1
-        # print("[gameState.player_act] current_max_chip: %d" % self.current_max_chips)
 
     # Conditions for a round/game to end
     def is_round_end(self):
@@ -189,7 +188,6 @@ class GameState:
         the only action left for them is either fold or call. The idea is that every player can only take up to
         2 actions in a single round
         '''
-        # print("[Is_round_end] repeat: %d, num_alive_players_not_been_processed: %d" % (self.repeat, self.num_alive_players_not_been_processed))
         if len(self.alive_indices) < 2:
             return True
         elif self.num_alive_players_not_been_processed > 0 and self.repeat:
