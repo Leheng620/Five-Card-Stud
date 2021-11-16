@@ -215,7 +215,11 @@ class GameState:
                 return False
         return True
 
-    def get_allow_actions(self, player):
+    def get_allow_actions(self):
+        '''
+        Return allowed actions of the current player
+        '''
+        player = self.get_current_player()
         if self.repeat:
             return [Actions.FOLD, Actions.CALL]
         else:

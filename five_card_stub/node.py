@@ -2,7 +2,7 @@ from constants import NodeMeta
 from math import sqrt, log
 
 class Node:
-    def __init__(self, node_id, player_id, action=None, parent=None, state=None):
+    def __init__(self, node_id, player_id, state, action=None, parent=None, ):
         '''
         Args:
             action:     the action taken at the parent node (which leads to this node)
@@ -22,19 +22,13 @@ class Node:
         self.children = {}  
         self.outcome = None
         self.state = state
-        self.needs_deal = False
 
     def add_child(self, action, child) -> None:
         '''
         Append to self.children
         '''
         self.children[action] = child
-    
-    def mark_deal_needed(self) -> None:
-        '''
-        Mark deal needed at this node, useful in simulation
-        '''
-        self.needs_deal = True
+
     
     @property
     def value(self) -> float:
