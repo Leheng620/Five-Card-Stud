@@ -100,5 +100,5 @@ class Actions(Enum):
 class NodeMeta:
     C = math.sqrt(2)
     INF = math.inf
-    RAISE_LIMIT = 2
+    N_ITERATIONS = int(1e5)
 
