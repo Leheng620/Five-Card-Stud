@@ -53,6 +53,7 @@ class RandomAgent(AbstractPlayer):
         Decide an action and act it
         '''
         action_tup = self.decide_action(game)
+        print("[debug] player %d, action: %s, raise_chip: %d" % (self.index, action_tup[0], action_tup[1]))
         self.act(game, action_tup)
 
     def act(self, game, action_tup):

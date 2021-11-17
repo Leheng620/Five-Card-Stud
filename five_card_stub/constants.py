@@ -102,3 +102,44 @@ class NodeMeta:
     INF = math.inf
     N_ITERATIONS = int(1e5)
 
+# ----------------------------- mcts -------------------------------
+
+# not_call_probability[number_of_cards] =
+# [weight of losing prob, weight of current highest chip / chip cap, weight of current highest chip / balance]
+# use it only when cannot be guaranteed to win
+not_call_probability = {
+    2: [0.2, 0.5, 0.2],
+    3: [0.4, 0.3, 0.2],
+    4: [0.5, 0.2, 0.3],
+    5: [1.0, 0, 0]
+}
+
+# not_raise_probability[number_of_cards] =
+# [weight of losing prob, weight of current highest chip / chip cap, weight of current highest chip / balance]
+not_raise_probability = {
+    2: [0.6, 0.2, 0.2],
+    3: [0.4, 0.4, 0.2],
+    4: [0.6, 0.2, 0.2],
+    5: [1.0, 0, 0]
+}
+
+# add_chip_amount[number_of_cards] =
+# [prob that the amount = (1-losing prob)*(max_chip-highest_chip),
+# if not the amount will be multiplied by the factor, show hand prob factor: result multiplied by losing prob]
+add_chip_amount = {
+    2: [0.2, 0.3, 0.05],
+    3: [0.3, 0.4, 0.1],
+    4: [0.7, 0.7, 0.4],
+    5: [1.0, 1.0, 1.0]
+}
+
+# ----------------------------- mcts -------------------------------
+
+def make_decision_using_probability(prob):
+    '''
+    :param prob: (prob*100)% is True, False otherwise
+    :return: True or False
+    '''
+    if int(prob * 100) >= random.randint(1, 100):
+        return True
+    return False

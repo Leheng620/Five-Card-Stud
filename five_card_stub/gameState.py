@@ -212,15 +212,14 @@ class GameState:
         player = self.get_current_player()
         # print("[ALLOW_ACTIONS] player.chip: %d, current_max_chip: %d, max_chip: %d" % (player.chip, self.current_max_chips, self.max_chips))
 
-        if self.repeat or self.current_max_chips == self.max_chips:
+        if self.repeat:
             # All the player has checked or raised or someone all-in
             return [Actions.FOLD, Actions.CALL]
+        elif player.chip == self.max_chips:
+            return [Actions.CHECK]
         else:
             if player.chip == self.current_max_chips:
-                if player.balance > 0:
-                    return [Actions.FOLD, Actions.CHECK, Actions.RAISE, Actions.ALL_IN]
-                else:
-                    return [Actions.FOLD, Actions.CHECK]
+                return [Actions.FOLD, Actions.CHECK, Actions.RAISE, Actions.ALL_IN]
             else: # there are players have raised
                 if player.balance > self.current_max_chips - player.chip:
                     return [Actions.FOLD, Actions.CALL, Actions.RAISE, Actions.ALL_IN]
@@ -239,6 +238,14 @@ class GameState:
             return alive_p[0].index
         alive_p.sort(key=cmp_func_map[5])
         return alive_p[-1].index
+
+    # def get_simulated_winner(self, player):
+    #     alive_p = self.get_alive_players()
+    #     if len(alive_p) == 1:
+    #         return alive_p[0].index
+    #
+    #     alive_p.sort(key=cmp_func_map[5])
+    #     return alive_p[-1].index
 
 
     # Get methods
