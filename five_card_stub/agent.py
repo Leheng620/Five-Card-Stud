@@ -77,6 +77,7 @@ class RandomAgent(AbstractPlayer):
             self.chip += chip_diff
 
         game.player_act(self.index, action, raise_chip, chip_diff)
+        # print("[ACT] player:", self.index, "action:", action, "chip:", self.chip, "balance:", self.balance)
 
     def append_card(self, card):
         self.cards.append(card)

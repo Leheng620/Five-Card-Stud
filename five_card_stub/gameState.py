@@ -47,13 +47,6 @@ class GameState:
         self.initializePlayers(balance, algorithm=algorithm)
         self.initialize_game_state()
 
-    def copyGameState(self):
-        new_state = deepcopy(self)
-        for i in range(self.n_players):
-            new_state.players[i] = deepcopy(self.players[i])
-        return new_state
-
-
     def initializePlayers(self, balance, algorithm="random") -> None:
         '''
         Deal two cards to each player, and initialize the players array.
@@ -217,15 +210,24 @@ class GameState:
         Return allowed actions of the current player
         '''
         player = self.get_current_player()
-        if self.repeat:
+        # print("[ALLOW_ACTIONS] player.chip: %d, current_max_chip: %d, max_chip: %d" % (player.chip, self.current_max_chips, self.max_chips))
+
+        if self.repeat or self.current_max_chips == self.max_chips:
+            # All the player has checked or raised or someone all-in
             return [Actions.FOLD, Actions.CALL]
         else:
             if player.chip == self.current_max_chips:
-                return [Actions.FOLD, Actions.CHECK, Actions.RAISE, Actions.ALL_IN]
-            elif self.current_max_chips == self.max_chips: # there are players have all-in
-                return [Actions.FOLD, Actions.CALL]
+                if player.balance > 0:
+                    return [Actions.FOLD, Actions.CHECK, Actions.RAISE, Actions.ALL_IN]
+                else:
+                    return [Actions.FOLD, Actions.CHECK]
             else: # there are players have raised
-                return [Actions.FOLD, Actions.CALL, Actions.RAISE, Actions.ALL_IN]
+                if player.balance > self.current_max_chips - player.chip:
+                    return [Actions.FOLD, Actions.CALL, Actions.RAISE, Actions.ALL_IN]
+                elif player.balance == self.current_max_chips - player.chip:
+                    return [Actions.FOLD, Actions.CALL]
+                else:
+                    return [Actions.FOLD]
 
 
     def is_game_end(self):

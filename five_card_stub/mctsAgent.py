@@ -20,23 +20,21 @@ class MCTSAgent(RandomAgent):
 
     def decide_action(self, game):
         self.root_state = deepcopy(game)                                         # Deepcopy the current game state
-        self.root_node = Node(self.node_count, self.index, self.root_state)      # Root Node: current game state
+        self.root_node = Node(self.node_count, None, None, self.index)      # Root Node: current game state
         self.node_count = 0
         for _ in range(self.n_iterations):
             # Keep selecting best child node until the leaf node
-            leaf = self.selection()
+            leaf, state = self.selection()
+            # print("[SELECTION] node: %d" % leaf.node_id)
 
-            # Expand the game tree, appending all the child node to the leaf node
-            child = self.expansion(leaf)
+            # Expand the game tree, appending all child nodes
+            child = self.expansion(leaf, state)
 
             # Simulate at an arbitrary child of node
-            winner_id = self.simulation(child)
+            winner_id = self.simulation(child, state)
 
             # Back-propogate from child to root
             self.back_propagate(winner_id, child)
-
-            print("----------------------------------------")
-            print()
 
         for child in self.root_node.children.values():
             print(child.node_id, child.action, child.N, child.U)
@@ -48,24 +46,42 @@ class MCTSAgent(RandomAgent):
         # game.print_cards()
         return action, raise_chip
 
+    def check_game_state_and_act(self, state, action):
+        '''
+        Return True if game ends;
+        Else, let the current player act and return False
+        '''
+        if state.is_round_end():
+            state.end_betting_round()
+            if state.is_game_end():
+                # Game ends, child is a leaf node
+                pass
+            else:
+                # Game continues, deal cards and start next betting round
+                state.deal()
+                state.start_betting_round()
+        
+        player = state.get_current_player()
+        action_tup = (action, 10 if action == Actions.RAISE else 0)
+        player.act(state, action_tup)
+
     def selection(self):
         '''
         Return a leaf node
         '''
+        state = deepcopy(self.root_state)
         node = self.root_node
         while len(node.children) > 0:
             values = [child.value for child in node.children.values()]
             node = random.choice([child for child in node.children.values() if child.value == max(values)])
-            print("[SELECTION] node: %d" % node.node_id)
-        return node
+            self.check_game_state_and_act(state, node.action)
+        return node, state
 
-    def expansion(self, node):
+    def expansion(self, node, state):
         '''
         Append all the child of node
         If node is a terminal node, return node itself; otherwise, return a random child of node
         '''
-        print("[EXPANSION] node: %d" % node.node_id)
-        state = node.state
         if state.is_round_end():
             state.end_betting_round()
             if state.is_game_end():
@@ -75,57 +91,63 @@ class MCTSAgent(RandomAgent):
                 return node
             else:
                 # Game continues, deal cards and start next betting round
-                state = state.copyGameState() # Should copy the game state, make sure parent is not ruined
                 state.deal()
                 state.start_betting_round()
 
-        allow_actions = state.get_allow_actions()
+        if node.actions_not_expanded is None:
+            node.actions_not_expanded = state.get_allow_actions()
+            for action in node.actions_not_expanded:
+                child = Node(self.node_count, action, node)
+                self.node_count += 1
+                node.add_child(action, child)
 
-        for action in allow_actions:
-            # Update state: next_player act
-            new_state = state.copyGameState()       # next_player will act on a copy of the current state
-            action_tup = (action, 10 if action == Actions.RAISE else 0)
-            curr_player = new_state.get_current_player()
-            curr_player.act(new_state, action_tup)
-            next_player = new_state.pop_get_next_player()
-            self.node_count += 1
-            child = Node(self.node_count, next_player.index, new_state, action, node)
-            node.add_child(action, child)
+        action = node.get_action_to_expand()
+
+        action_tup = (action, 10 if action == Actions.RAISE else 0)
+        curr_player = state.get_current_player()
+        curr_player.act(state, action_tup)
+        next_player = state.pop_get_next_player()
+        node.set_player_id(next_player.index)
         
-        return random.choice(list(node.children.values()))
+        return child
 
-    def simulation(self, node) -> int:
+    def simulation(self, node, state) -> int:
         '''
         Simulate from node till the game ends
         Return the result (winner id)
         '''
-        state = node.state.copyGameState()
         while True:
-            print("[SIMULATION] round: %d, curr_player: %d" % (state.round, state.curr_player))
             if state.is_round_end():
                 state.end_betting_round()
                 if state.is_game_end():
                     # Game ends, child is a leaf node
                     winner = state.get_winner()
                     node.outcome = winner
+                    # print("***[Game End] winner: %d" % winner)
                     return winner
                 else:
                     # Game continues, deal cards and start next betting round
                     state.deal()
                     state.start_betting_round()
+                    # print("***[Round End] round: %d" % state.round)
 
             action = random.choice(state.get_allow_actions()) # Choose a random action
             action_tup = (action, 10 if action == Actions.RAISE else 0)
+
+
             curr_player = state.get_current_player()
             curr_player.act(state, action_tup)
             state.pop_get_next_player()
+
+    def simulate_action(self, state):
+        actions = state.get_allow_actions()
+        
     
     def back_propagate(self, winner_id, leaf):
         node = leaf
         while node is not None:
-            print("[BACK-PROPOGATE] node: %d" % node.node_id)
             node.N += 1
-            if node.parent is not None and node.parent.player_id == winner_id:
+            if node.player_id == winner_id:
                 node.U += 1
             node = node.parent
         
@@ -137,7 +159,7 @@ class MCTSAgent(RandomAgent):
     #     print("[Expand] node:", node.node_id, ", player:", node.player_id, ", allow_actions:", allow_actions)
     #     for action in allow_actions:
     #         # Update state: next_player act
-    #         new_state = state.copyGameState()       # next_player will act on a copy of the current state
+    #         new_state = deepcopy(state)       # next_player will act on a copy of the current state
     #         action_tup = (action, 10 if action == Actions.RAISE else 0)
     #         curr_player = new_state.get_current_player()
     #         curr_player.act(new_state, action_tup)

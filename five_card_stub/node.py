@@ -1,8 +1,9 @@
 from constants import NodeMeta
 from math import sqrt, log
+import random
 
 class Node:
-    def __init__(self, node_id, player_id, state, action=None, parent=None, ):
+    def __init__(self, node_id, action=None, parent=None, player_id=None):
         '''
         Args:
             action:     the action taken at the parent node (which leads to this node)
@@ -21,7 +22,19 @@ class Node:
         self.U = 0
         self.children = {}  
         self.outcome = None
-        self.state = state
+        self.actions_not_expanded = None
+
+    def set_player_id(self, id):
+        self.player_id = id
+
+    def get_action_to_expand(self):
+        '''
+        Return a ramdom unexpanded action
+        '''
+        action = random.choice(self.actions_not_expanded)
+        self.actions_not_expanded.remove(action)
+        return action
+
 
     def add_child(self, action, child) -> None:
         '''
