@@ -60,7 +60,7 @@ class MCTSAgent(RandomAgent):
             state.end_betting_round()
             if state.is_game_end():
                 # Game ends, child is a leaf node
-                pass
+                return
             else:
                 # Game continues, deal cards and start next betting round
                 state.deal()
