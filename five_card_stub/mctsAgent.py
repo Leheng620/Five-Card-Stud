@@ -10,16 +10,16 @@ import random
 
 CARD_DECK = create_half_deck()
 class MCTSAgent(RandomAgent):
-    def __init__(self, balance, index, cards, chip, alive):
+    def __init__(self, balance, index, chip, alive):
         '''
         Args:
             root_state:  the game state before each betting round
         '''
-        super().__init__(balance, index, cards, chip, alive)
+        super().__init__(balance, index, chip, alive)
         self.root_state = None
         self.root_node = None
         self.node_count = 0   # The number of node in the tree
-        self.n_iterations = 1000
+        self.n_iterations = 100
 
     def decide_action(self, game):
         # if game.round < 4: return Actions.CHECK, 0
