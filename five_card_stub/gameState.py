@@ -219,14 +219,20 @@ class GameState:
             return [Actions.CHECK]
         else:
             if player.chip == self.current_max_chips:
-                return [Actions.FOLD, Actions.CHECK, Actions.RAISE, Actions.ALL_IN]
+                return [Actions.FOLD, Actions.CHECK, Actions.RAISE]
             else: # there are players have raised
-                if player.balance > self.current_max_chips - player.chip:
-                    return [Actions.FOLD, Actions.CALL, Actions.RAISE, Actions.ALL_IN]
-                elif player.balance == self.current_max_chips - player.chip:
+                if player.chip == self.current_max_chips:
+                    return [Actions.CHECK, Actions.FOLD, Actions.RAISE]
+                elif self.current_max_chips == self.max_chips:  # there are players have all-in
                     return [Actions.FOLD, Actions.CALL]
                 else:
-                    return [Actions.FOLD]
+                    return [Actions.FOLD, Actions.CALL, Actions.RAISE]
+                # if player.balance > self.current_max_chips - player.chip:
+                #     return [Actions.FOLD, Actions.CALL, Actions.RAISE]
+                # elif player.balance == self.current_max_chips - player.chip:
+                #     return [Actions.FOLD, Actions.CALL]
+                # else:
+                #     return [Actions.FOLD]
 
 
     def is_game_end(self):

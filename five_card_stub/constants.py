@@ -98,7 +98,7 @@ class Actions(Enum):
 
 # The constants in Node class
 class NodeMeta:
-    C = math.sqrt(2)
+    C = 1
     INF = math.inf
     N_ITERATIONS = int(1e5)
 

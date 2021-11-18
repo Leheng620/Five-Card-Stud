@@ -46,7 +46,8 @@ class MCTSAgent(RandomAgent):
         child = random.choice([child for child in self.root_node.children.values() if child.value == max(values)])
         action = child.action
         raise_chip = 10 if action == Actions.RAISE else 0
-        raise_chip = self.calculate_prob_weight_given_actions([action], self.root_state)[1]
+        raise_chip = calculate_prob_weight_given_actions(self.root_state.get_current_player(),
+                                                         [action], self.root_state)[1]
 
         # game.print_cards()
         return action, raise_chip
@@ -67,7 +68,8 @@ class MCTSAgent(RandomAgent):
                 state.start_betting_round()
         
         player = state.get_current_player()
-        action_tup = (action, 10 if action == Actions.RAISE else 0)
+        raise_amount = calculate_prob_weight_given_actions(player, [action], state)[1]
+        action_tup = (action, raise_amount)
         player.act(state, action_tup)
         state.pop_get_next_player()
 
@@ -110,7 +112,8 @@ class MCTSAgent(RandomAgent):
 
         action = node.get_action_to_expand()
 
-        action_tup = (action, 10 if action == Actions.RAISE else 0)
+        raise_amount = calculate_prob_weight_given_actions(state.get_current_player(), [action], state)[1]
+        action_tup = (action, raise_amount)
         curr_player = state.get_current_player()
         curr_player.act(state, action_tup)
         next_player = state.pop_get_next_player()
@@ -139,10 +142,10 @@ class MCTSAgent(RandomAgent):
                     # print("***[Round End] round: %d" % state.round)
 
             allow_actions = state.get_allow_actions()
-            weights, raise_amount = state.get_current_player().calculate_prob_weight_given_actions(allow_actions, state)
-            # action = random.choice(state.get_allow_actions()) # Choose a random action
+            weights, raise_amount = calculate_prob_weight_given_actions(state.get_current_player(), allow_actions, state)
+            action = random.choice(state.get_allow_actions()) # Choose a random action
             # action_tup = (action, 10 if action == Actions.RAISE else 0)
-            action = random.choices(allow_actions, weights)[0] # Choose a random action
+            # action = random.choices(allow_actions, weights)[0] # Choose a random action
             raise_amount = 0 if action == Actions.CHECK or action == Actions.FOLD or action == Actions.CALL else raise_amount
             action_tup = (action, raise_amount)
 
@@ -197,91 +200,91 @@ class MCTSAgent(RandomAgent):
             
     #         print()
 
-    def calculate_prob_weight_given_actions(self, actions, state):
-        if len(actions) == 1:
-            return [1], 0
-        weights = np.zeros((len(actions),))
-        raise_amount = 0
-        players_remain = state.get_alive_players()
-        highest_chip = max([i.chip for i in players_remain])
-        card_deck = self.create_remaining_card_deck([i for i in state.players if i != self])
-        losing_prob = self.calculate_losing_prob(players_remain, card_deck)
-        cost_percentage = highest_chip / state.max_chips
-        balance_percentage = highest_chip / (self.balance + self.chip)
+def calculate_prob_weight_given_actions(player, actions, state):
+    # if len(actions) == 1:
+    #     return [1], 0
+    weights = np.zeros((len(actions),))
+    raise_amount = state.ante
+    players_remain = [p for p in state.get_alive_players() if p != player]
+    highest_chip = max([i.chip for i in players_remain])
+    card_deck = create_remaining_card_deck(player, [i for i in state.players if i != player])
+    losing_prob = calculate_losing_prob(player, players_remain, card_deck)
+    cost_percentage = highest_chip / state.max_chips
+    balance_percentage = highest_chip / (player.balance + player.chip)
 
-        for i, action in enumerate(actions):
-            if action == Actions.RAISE:
-                prob_table = not_raise_probability[len(self.cards)]
-                not_raise_prob = prob_table[0] * losing_prob + prob_table[1] * cost_percentage + prob_table[
-                    2] * balance_percentage
-                raise_prob = 1 - not_raise_prob
-                chip_remains = state.max_chips - highest_chip
-                raise_amount = self.handle_add_chip(losing_prob, chip_remains)
-                weights[i] = raise_prob
-            elif action == Actions.CHECK:
-                prob_table = not_raise_probability[len(self.cards)]
-                not_raise_prob = prob_table[0] * losing_prob + prob_table[1] * cost_percentage + prob_table[
-                    2] * balance_percentage
-                weights[i] = not_raise_prob
-            elif action == Actions.CALL:
-                prob_table = not_call_probability[len(self.cards)]
-                not_call_prob = prob_table[0] * losing_prob + prob_table[1] * cost_percentage + prob_table[
-                    2] * balance_percentage
-                call_prob = 1 - not_call_prob
-                weights[i] = call_prob
-            elif action == Actions.FOLD:
-                prob_table = not_call_probability[len(self.cards)]
-                not_call_prob = prob_table[0] * losing_prob + prob_table[1] * cost_percentage + prob_table[
-                    2] * balance_percentage
-                weights[i] = not_call_prob
-            else:
-                weights[i] = (1-losing_prob) * add_chip_amount[len(self.cards)][2]
-                raise_amount = state.max_chips - self.chip
-        weights *= 100
-        weights = weights.astype(dtype=int)
+    for i, action in enumerate(actions):
+        if action == Actions.RAISE:
+            prob_table = not_raise_probability[len(player.cards)]
+            not_raise_prob = prob_table[0] * losing_prob + prob_table[1] * cost_percentage + prob_table[
+                2] * balance_percentage
+            raise_prob = 1 - not_raise_prob
+            chip_remains = state.max_chips - highest_chip
+            raise_amount = handle_add_chip(player, losing_prob, chip_remains)
+            weights[i] = raise_prob
+        elif action == Actions.CHECK:
+            prob_table = not_raise_probability[len(player.cards)]
+            not_raise_prob = prob_table[0] * losing_prob + prob_table[1] * cost_percentage + prob_table[
+                2] * balance_percentage
+            weights[i] = not_raise_prob
+        elif action == Actions.CALL:
+            prob_table = not_call_probability[len(player.cards)]
+            not_call_prob = prob_table[0] * losing_prob + prob_table[1] * cost_percentage + prob_table[
+                2] * balance_percentage
+            call_prob = 1 - not_call_prob
+            weights[i] = call_prob
+        elif action == Actions.FOLD:
+            prob_table = not_call_probability[len(player.cards)]
+            not_call_prob = prob_table[0] * losing_prob + prob_table[1] * cost_percentage + prob_table[
+                2] * balance_percentage
+            weights[i] = not_call_prob
+        else:
+            weights[i] = (1-losing_prob) * add_chip_amount[len(player.cards)][2]
+            raise_amount = state.max_chips - player.chip
+    weights *= 100
+    weights = weights.astype(dtype=int)
 
-        return weights.tolist(), raise_amount
+    return weights.tolist(), raise_amount
 
 
 
-    def calculate_losing_prob(self, other_players_objs, card_deck):
-        num_of_cards = len(self.cards)
-        calling_func = {2: cmp_two_cards, 3: cmp_three_cards, 4: cmp_four_cards, 5: cmp_five_cards}
-        self_card_type = calling_func[num_of_cards](self, cards=self.cards)
-        max_losing_prob = 0
-        for player in other_players_objs:
-            possibility = []  # possible type
-            for card in card_deck:
-                player_cards = player.revealed_cards + [card]
-                possibility.append(calling_func[num_of_cards](player, cards=player_cards))
-            possibility.sort(reverse=True)
-            count = 0
-            for p in possibility:
-                if p < self_card_type:
-                    break
-                count += 1
-            prob = count / len(possibility)  # # larger than self / total
-            max_losing_prob = max(max_losing_prob, prob)
-        return max_losing_prob
+def calculate_losing_prob(player, other_players_objs, card_deck):
+    num_of_cards = len(player.cards)
+    calling_func = {2: cmp_two_cards, 3: cmp_three_cards, 4: cmp_four_cards, 5: cmp_five_cards}
+    self_card_type = calling_func[num_of_cards](player, cards=player.cards)
+    max_losing_prob = 0
+    for player_obj in other_players_objs:
+        possibility = []  # possible type
+        for card in card_deck:
+            player_cards = player_obj.revealed_cards + [card]
+            possibility.append(calling_func[num_of_cards](player_obj, cards=player_cards))
+        possibility.sort(reverse=True)
+        count = 0
+        for p in possibility:
+            if p < self_card_type:
+                break
+            count += 1
+        prob = count / len(possibility)  # # larger than self / total
+        max_losing_prob = max(max_losing_prob, prob)
+    return max_losing_prob
 
-    def handle_add_chip(self, losing_prob, remain_chip_total):
-        showhand_prob = losing_prob * add_chip_amount[len(self.cards)][2]
-        if make_decision_using_probability(showhand_prob):
-            return remain_chip_total
-        no_factor_prob = add_chip_amount[len(self.cards)][0]
-        if make_decision_using_probability(no_factor_prob):
-            return int((1-losing_prob) * remain_chip_total)
-        return int(add_chip_amount[len(self.cards)][1] * (1-losing_prob) * remain_chip_total)
+def handle_add_chip(player, losing_prob, remain_chip_total):
+    showhand_prob = (1-losing_prob) * add_chip_amount[len(player.cards)][2]
+    if make_decision_using_probability(showhand_prob):
+        return remain_chip_total
+    no_factor_prob = add_chip_amount[len(player.cards)][0]
+    if make_decision_using_probability(no_factor_prob):
+        return int((1-losing_prob) * remain_chip_total)
+    return int(add_chip_amount[len(player.cards)][1] * (1-losing_prob) * remain_chip_total)
 
-    def create_remaining_card_deck(self, other_players_objs):
-        cards_on_table = [j for i in other_players_objs for j in i.revealed_cards] + self.cards
-        cards_on_table_set = set(cards_on_table)
-        cards = []
-        # a little stupid O(mn) algor, worse case for half deck m = 24, n = 24,
-        #  use sort() to speed up if necessary
-        for card in CARD_DECK:
-            if not card in cards_on_table_set:
-                cards.append(card)
-        return cards
+def create_remaining_card_deck(player, other_players_objs):
+    cards_on_table = [j for i in other_players_objs for j in i.revealed_cards] + player.cards
+    cards_on_table_set = set(cards_on_table)
+    cards = []
+    # a little stupid O(mn) algor, worse case for half deck m = 24, n = 24,
+    #  use sort() to speed up if necessary
+    for card in CARD_DECK:
+        if not card in cards_on_table_set:
+            cards.append(card)
+    return cards
 
         
