@@ -2,19 +2,19 @@ from constants import Actions
 import random
 
 class AbstractPlayer:
-    def __init__(self, balance, index, cards, chip, alive):
+    def __init__(self, balance, index, chip, alive):
         self.balance = balance # the player's balance.
         self.index = index
-        self.cards = cards # all cards on deck
-        self.__secret_card = cards[0] # the face-down card, only self can access
-        self.revealed_cards = cards[1:] # the cards being revealed to other players
+        self.cards = None # all cards on deck
+        self.__secret_card = None # the face-down card, only self can access
+        self.revealed_cards = None # the cards being revealed to other players
         self.chip = chip # current chip the player has raised
         self.alive = alive
 
 class RandomAgent(AbstractPlayer):
 
-    def __init__(self, balance, index, cards, chip, alive):
-        super(RandomAgent, self).__init__(balance, index, cards, chip, alive)
+    def __init__(self, balance, index, chip, alive):
+        super(RandomAgent, self).__init__(balance, index, chip, alive)
 
     def decide_action(self, game):
         '''
@@ -53,7 +53,7 @@ class RandomAgent(AbstractPlayer):
         Decide an action and act it
         '''
         action_tup = self.decide_action(game)
-        print("[debug] player %d, action: %s, raise_chip: %d" % (self.index, action_tup[0], action_tup[1]))
+        # print("[debug] player %d, action: %s, raise_chip: %d" % (self.index, action_tup[0], action_tup[1]))
         self.act(game, action_tup)
 
     def act(self, game, action_tup):
@@ -83,5 +83,19 @@ class RandomAgent(AbstractPlayer):
     def append_card(self, card):
         self.cards.append(card)
         self.revealed_cards = self.cards[1:]
+    
+    def player_checkout(self):
+        self.chip = 0
+        # If a player can not pay the ante for the next round, quit the game
+        # if self.balance < self.ante:
+        #     self.alive = False
+        
+        self.cards.clear()
+
+    def set_init_cards(self, card_pair):
+        self.cards = card_pair
+        self.__secret_card = self.cards[0] # the face-down card, only self can access
+        self.revealed_cards = self.cards[1:] # the cards being revealed to other players
+
     
 

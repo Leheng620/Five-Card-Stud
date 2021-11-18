@@ -40,12 +40,11 @@ class GameState:
 
         # Info for betting round
         self.player_queue = deque()
-        self.curr_player = 0
+        self.curr_player = None
         self.repeat = False
         self.num_alive_players_not_been_processed = 0
 
         self.initializePlayers(balance, algorithm=algorithm)
-        self.initialize_game_state()
 
     def initializePlayers(self, balance, algorithm="random") -> None:
         '''
@@ -53,17 +52,22 @@ class GameState:
         balance: initial balance each player has
         ante: the price of the entrance ticket
         '''
-        init_card_pairs = [[] for _ in range(self.n_players)]
-        for _ in range(2):
-            for i in self.alive_indices:
-                top_card = self.generate_random_card()
-                init_card_pairs[i].append(top_card)
-        if algorithm == "mcts":
-            self.players = [MCTSAgent(balance, i, card_pair, 0, True) for i, card_pair in enumerate(init_card_pairs)]
+        if algorithm == "compare":
+            self.players = [MCTSAgent(balance, 0, 0, True), RandomAgent(balance, 1, 0, True)]
+        elif algorithm == "mcts":
+            self.players = [MCTSAgent(balance, i, 0, True) for i in range(self.n_players)]
         else:
-            self.players = [RandomAgent(balance, i, card_pair, 0, True) for i, card_pair in enumerate(init_card_pairs)]
+            self.players = [RandomAgent(balance, i, 0, True) for i in range(self.n_players)]
 
     def initialize_game_state(self):
+        # Reset game state
+        self.round = 1
+        self.used_card.clear()
+
+        # Mark all players as alive
+        self.alive_indices = list(range(self.n_players))
+        self.curr_player = None
+
         # The maximum chips players can put in (when all in) is the lowest balance a player has among all players.
         self.max_chips = min([p.balance for p in self.players])
 
@@ -75,6 +79,30 @@ class GameState:
         self.total_chips = self.ante * len(self.players)
 
         self.pay_entrance_ticket()
+
+        # Deal two cards to each player
+        init_card_pairs = [[] for _ in range(self.n_players)]
+        for _ in range(2):
+            for i in self.alive_indices:
+                top_card = self.generate_random_card()
+                init_card_pairs[i].append(top_card)
+        for i, p in enumerate(self.players):
+            p.alive = True
+            p.set_init_cards(init_card_pairs[i])
+
+
+
+    def checkout(self):
+        '''
+        Give self.total_chips to the winner
+        '''
+        winner_p = self.players[self.get_winner()]
+        winner_p.balance += self.total_chips
+        self.total_chips = 0
+
+        # Checkout each player
+        for p in self.players:
+            p.player_checkout()
 
     def pay_entrance_ticket(self):
         for i, p in enumerate(self.players):
@@ -244,6 +272,13 @@ class GameState:
             return alive_p[0].index
         alive_p.sort(key=cmp_func_map[5])
         return alive_p[-1].index
+    
+    def is_terminal(self):
+        for p in self.players:
+            if p.balance < self.ante:
+                return True
+        return False
+
 
     # def get_simulated_winner(self, player):
     #     alive_p = self.get_alive_players()
@@ -273,8 +308,10 @@ class GameState:
                 print(str(c), sep=', ', end='; ')
             print()
 
-
-
+    def print_results(self):
+        print("Results:")
+        for p in self.players:
+            print("[Player %d] balance: %d" % (p.index, p.balance))
 
 
 
