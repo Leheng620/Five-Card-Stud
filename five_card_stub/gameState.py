@@ -329,12 +329,12 @@ class GameState:
         '''
         Helper function for debugging
         '''
-        print("------------------------------")
+        debug("------------------------------")
         for p in self.players:
-            print("Player %d" % p.index)
+            debug("Player %d" % p.index)
             for c in p.cards:
-                print(str(c), sep=', ', end='; ')
-            print()
+                debug(str(c), sep=', ', end='; ')
+            debug()
 
     def print_results(self):
         print("Results:")

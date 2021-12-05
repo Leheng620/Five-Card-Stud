@@ -2,6 +2,7 @@ from gameState import GameState
 from agent import *
 from card import *
 from collections import Counter
+from constants import debug
 
 
 def play_game(t):
@@ -23,13 +24,13 @@ def play_game(t):
             while True:
                 player = game.pop_get_next_player()
                 player.play(game)
-                # print("[debug] total_chips:", game.total_chips, "current_max_chips:",game.current_max_chips,
-                #     "player:", player.index, "balance:", player.balance)
+                debug("total_chips:", game.total_chips, "current_max_chips:",game.current_max_chips,
+                    "player:", player.index, "balance:", player.balance)
                 if game.is_round_end():
                     break
             game.end_betting_round()
             if game.is_game_end():
-                # print("player %d wins %d chips!" % (game.get_winner(), game.total_chips))
+                debug("player %d wins %d chips!" % (game.get_winner(), game.total_chips))
                 game.checkout()
                 # game.print_results()
                 break
@@ -38,17 +39,17 @@ def play_game(t):
         if game.is_terminal():
             break
     balances = [p.balance for p in game.players]
-    winner = balances.index(max(balances))
-    print("[debug] play: %d, winner: player %d" % (t, winner) )
-    return winner
+    return balances.index(max(balances))
 
-
-def main():
+def main(debug=0):
+    Debug.debug = debug
     winner_lst = []
-    for t in range(100):
-        winner = play_game(t)
+    for i in range(1000):
+        winner = play_game()
         winner_lst.append(winner)
-    
+        if i % 10 == 0:
+            print(Counter(winner_lst))
+
     counter = Counter(winner_lst)
     print(counter)
 
