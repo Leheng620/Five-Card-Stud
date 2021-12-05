@@ -143,3 +143,11 @@ def make_decision_using_probability(prob):
     if int(prob * 100) >= random.randint(1, 100):
         return True
     return False
+
+class Debug:
+    debug = 0
+
+def debug(*msg, sep=' ', end='\n'):
+    if Debug.debug == 1:
+        print("[DEBUG] ", end='')
+        print(*msg, sep=sep, end=end)

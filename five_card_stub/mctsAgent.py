@@ -1,6 +1,6 @@
 from agent import RandomAgent
 from constants import Actions, NodeMeta, add_chip_amount, not_call_probability, not_raise_probability,\
-    make_decision_using_probability
+    make_decision_using_probability, debug
 from copy import deepcopy
 from node import Node
 from card import cmp_two_cards, cmp_three_cards, cmp_four_cards, cmp_five_cards, create_half_deck
@@ -41,7 +41,7 @@ class MCTSAgent(RandomAgent):
             self.back_propagate(winner_id, child)
 
         for child in self.root_node.children.values():
-            print(child.node_id, child.action, child.N, child.U)
+            debug(child.node_id, child.action, child.N, child.U)
         values = [child.value for child in self.root_node.children.values()]
         child = random.choice([child for child in self.root_node.children.values() if child.value == max(values)])
         action = child.action

@@ -3,6 +3,7 @@ from gameState import GameState
 from agent import *
 from card import *
 from collections import Counter
+from constants import debug
 
 
 def play_game():
@@ -24,13 +25,13 @@ def play_game():
             while True:
                 player = game.pop_get_next_player()
                 player.play(game)
-                print("[debug] total_chips:", game.total_chips, "current_max_chips:",game.current_max_chips,
+                debug("total_chips:", game.total_chips, "current_max_chips:",game.current_max_chips,
                     "player:", player.index, "balance:", player.balance)
                 if game.is_round_end():
                     break
             game.end_betting_round()
             if game.is_game_end():
-                print("player %d wins %d chips!" % (game.get_winner(), game.total_chips))
+                debug("player %d wins %d chips!" % (game.get_winner(), game.total_chips))
                 game.checkout()
                 game.print_results()
                 break
@@ -39,15 +40,18 @@ def play_game():
         if game.is_terminal():
             break
     balances = [p.balance for p in game.players]
-    return argmax(balances)
+    return balances.index(max(balances))
 
-def main():
+def main(debug=0):
+    Debug.debug = debug
     winner_lst = []
-    for _ in range(100):
+    for i in range(1000):
         winner = play_game()
         winner_lst.append(winner)
-    
-    counter = Counter(winner)
+        if i % 10 == 0:
+            print(Counter(winner_lst))
+
+    counter = Counter(winner_lst)
     print(counter)
 
 if __name__ == "__main__":
