@@ -3,6 +3,17 @@ from math import sqrt, log
 import random
 
 class Node:
+    __slots__ = [
+        'node_id', 
+        'player_id',
+        'action',
+        'parent',
+        'N',
+        'U',
+        'children',
+        'outcome',
+        'actions_not_expanded']
+        
     def __init__(self, node_id, action=None, parent=None, player_id=None):
         '''
         Args:

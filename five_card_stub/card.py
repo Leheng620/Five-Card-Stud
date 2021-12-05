@@ -5,6 +5,10 @@ class Card():
     def __init__(self, suit, rank):
         self.suit = suit
         self.rank = rank
+    
+    def copy(self):
+        card = Card(self.suit, self.rank)
+        return card
 
     def same_suit(self, card):
         return self.suit == card.suit
