@@ -3,10 +3,9 @@ from card import *
 import random
 from collections import deque
 from mctsAgent import MCTSAgent
-from copy import deepcopy
 
 class GameState:
-    def __init__(self, n_players=2, balance=100, ante=5, algorithm="random"):
+    def __init__(self, n_players=2, balance=100, ante=5, algorithm="random", prevState=None):
         '''
         round:          rounds of card dealing so far
                         round 0 => two cards each player
@@ -28,23 +27,52 @@ class GameState:
         num_alive_players_not_been_processed:     
                         the number of players that have not taken an action yet
         '''
-        self.round = 1
-        self.n_players = n_players
-        self.players = None
-        self.alive_indices = list(range(n_players))
-        self.total_chips = 0
-        self.max_chips = 0
-        self.used_card = set()
-        self.ante = ante
-        self.current_max_chips = 0
+        if prevState != None:
+            self.round = prevState.round
+            self.n_players = prevState.n_players
+            self.players = list(prevState.players)
+            self.alive_indices = prevState.alive_indices[:]
+            self.total_chips = prevState.total_chips
+            self.max_chips = prevState.max_chips
+            self.used_card = prevState.used_card.copy()
+            self.ante = prevState.ante
+            self.current_max_chips = prevState.current_max_chips
 
-        # Info for betting round
-        self.player_queue = deque()
-        self.curr_player = None
-        self.repeat = False
-        self.num_alive_players_not_been_processed = 0
+            self.player_queue = prevState.player_queue.copy()
+            self.curr_player = prevState.curr_player
+            self.repeat = prevState.repeat
+            self.num_alive_players_not_been_processed = prevState.num_alive_players_not_been_processed
+            self.first_player = prevState.first_player
 
-        self.initializePlayers(balance, algorithm=algorithm)
+        else:
+            self.round = 1
+            self.n_players = n_players
+            self.players = None
+            self.alive_indices = list(range(n_players))
+            self.total_chips = 0
+            self.max_chips = 0
+            self.used_card = set()
+            self.ante = ante
+            self.current_max_chips = 0
+
+            # Info for betting round
+            self.player_queue = deque()
+            self.curr_player = None
+            self.repeat = False
+            self.num_alive_players_not_been_processed = 0
+            self.first_player = None
+
+            self.initializePlayers(balance, algorithm=algorithm)
+
+    def deepCopy(self):
+        state = GameState(prevState=self)
+        state.players = [player.deepCopy() for player in self.players]
+        state.alive_indices = [i for i in self.alive_indices]
+        state.used_card = set()
+        for c in self.used_card:
+            state.used_card.add(c)
+        state.player_queue = deque(self.player_queue)
+        return state
 
     def initializePlayers(self, balance, algorithm="random") -> None:
         '''

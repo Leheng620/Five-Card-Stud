@@ -1,4 +1,3 @@
-from numpy.core.fromnumeric import argmax
 from gameState import GameState
 from agent import *
 from card import *
@@ -6,7 +5,7 @@ from collections import Counter
 from constants import debug
 
 
-def play_game():
+def play_game(t):
     '''
     Return the winner index
     '''
@@ -14,12 +13,12 @@ def play_game():
     game_count = 0
     while True:
         game_count += 1
-        print("*************************************************")
-        print("Game %d starts..." % game_count)
+        # print("*************************************************")
+        # print("Game %d starts..." % game_count)
         game.initialize_game_state()
 
         while True:
-            game.print_cards()
+            # game.print_cards()
             game.start_betting_round()
 
             while True:
@@ -33,7 +32,7 @@ def play_game():
             if game.is_game_end():
                 debug("player %d wins %d chips!" % (game.get_winner(), game.total_chips))
                 game.checkout()
-                game.print_results()
+                # game.print_results()
                 break
             else:
                 game.deal()

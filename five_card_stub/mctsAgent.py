@@ -1,16 +1,14 @@
 from agent import RandomAgent
 from constants import Actions, NodeMeta, add_chip_amount, not_call_probability, not_raise_probability,\
     make_decision_using_probability, debug
-from copy import deepcopy
 from node import Node
 from card import cmp_two_cards, cmp_three_cards, cmp_four_cards, cmp_five_cards, create_half_deck
-import time
 import numpy as np
 import random
 
 CARD_DECK = create_half_deck()
 class MCTSAgent(RandomAgent):
-    def __init__(self, balance, index, chip, alive):
+    def __init__(self, balance=100, index=0, chip=0, alive=True):
         '''
         Args:
             root_state:  the game state before each betting round
@@ -19,11 +17,21 @@ class MCTSAgent(RandomAgent):
         self.root_state = None
         self.root_node = None
         self.node_count = 0   # The number of node in the tree
-        self.n_iterations = 100
-
+        self.n_iterations = 500
+    
+    def deepCopy(self):
+        '''
+        Deepcopy the player object
+        '''
+        state = MCTSAgent(self.balance, self.index, self.chip, self.alive)
+        state.cards = [card.copy() for card in self.cards]
+        state.revealed_cards = state.cards[1:]
+        state.__secret_card = state.cards[0]
+        return state
+        
     def decide_action(self, game):
         # if game.round < 4: return Actions.CHECK, 0
-        self.root_state = deepcopy(game)                                         # Deepcopy the current game state
+        self.root_state = game.deepCopy()                            # Deepcopy the current game state
         self.root_node = Node(self.node_count, None, None, self.index)      # Root Node: current game state
         self.node_count = 0
         for _ in range(self.n_iterations):
@@ -77,7 +85,7 @@ class MCTSAgent(RandomAgent):
         '''
         Return a leaf node
         '''
-        state = deepcopy(self.root_state)
+        state = self.root_state.deepCopy()
         node = self.root_node
         while len(node.children) > 0:
             values = [child.value for child in node.children.values()]
@@ -144,19 +152,13 @@ class MCTSAgent(RandomAgent):
             allow_actions = state.get_allow_actions()
             weights, raise_amount = calculate_prob_weight_given_actions(state.get_current_player(), allow_actions, state)
             action = random.choice(state.get_allow_actions()) # Choose a random action
-            # action_tup = (action, 10 if action == Actions.RAISE else 0)
-            # action = random.choices(allow_actions, weights)[0] # Choose a random action
             raise_amount = 0 if action == Actions.CHECK or action == Actions.FOLD or action == Actions.CALL else raise_amount
             action_tup = (action, raise_amount)
 
 
             curr_player = state.get_current_player()
             curr_player.act(state, action_tup)
-            state.pop_get_next_player()
-
-    def simulate_action(self, state):
-        actions = state.get_allow_actions()
-        
+            state.pop_get_next_player()        
     
     def back_propagate(self, winner_id, leaf):
         node = leaf

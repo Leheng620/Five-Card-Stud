@@ -3,6 +3,7 @@ import random
 
 class AbstractPlayer:
     def __init__(self, balance, index, chip, alive):
+        
         self.balance = balance # the player's balance.
         self.index = index
         self.cards = None # all cards on deck
@@ -10,11 +11,31 @@ class AbstractPlayer:
         self.revealed_cards = None # the cards being revealed to other players
         self.chip = chip # current chip the player has raised
         self.alive = alive
+    
+    def deepCopy(self):
+        '''
+        Deepcopy the player object
+        '''
+        state = AbstractPlayer(self.balance, self.index, self.chip, self.alive)
+        state.cards = [card.copy() for card in self.cards]
+        state.revealed_cards = state.cards[1:]
+        state.__secret_card = state.cards[0]
+        return state
 
 class RandomAgent(AbstractPlayer):
 
     def __init__(self, balance, index, chip, alive):
         super(RandomAgent, self).__init__(balance, index, chip, alive)
+    
+    def deepCopy(self):
+        '''
+        Deepcopy the player object
+        '''
+        state = RandomAgent(self.balance, self.index, self.chip, self.alive)
+        state.cards = [card.copy() for card in self.cards]
+        state.revealed_cards = state.cards[1:]
+        state.__secret_card = state.cards[0]
+        return state
 
     def decide_action(self, game):
         '''
@@ -85,11 +106,7 @@ class RandomAgent(AbstractPlayer):
         self.revealed_cards = self.cards[1:]
     
     def player_checkout(self):
-        self.chip = 0
-        # If a player can not pay the ante for the next round, quit the game
-        # if self.balance < self.ante:
-        #     self.alive = False
-        
+        self.chip = 0        
         self.cards.clear()
 
     def set_init_cards(self, card_pair):
