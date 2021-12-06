@@ -5,7 +5,7 @@ from collections import deque
 from mctsAgent import MCTSAgent
 
 class GameState:
-    def __init__(self, n_players=2, balance=100, ante=5, algorithm="random", prevState=None):
+    def __init__(self, n_players=2, balance=100, ante=5, prevState=None):
         '''
         round:          rounds of card dealing so far
                         round 0 => two cards each player
@@ -37,6 +37,7 @@ class GameState:
             self.used_card = prevState.used_card.copy()
             self.ante = prevState.ante
             self.current_max_chips = prevState.current_max_chips
+            self.balance = prevState.balance
 
             self.player_queue = prevState.player_queue.copy()
             self.curr_player = prevState.curr_player
@@ -54,6 +55,7 @@ class GameState:
             self.used_card = set()
             self.ante = ante
             self.current_max_chips = 0
+            self.balance = balance
 
             # Info for betting round
             self.player_queue = deque()
@@ -61,8 +63,6 @@ class GameState:
             self.repeat = False
             self.num_alive_players_not_been_processed = 0
             self.first_player = None
-
-            self.initializePlayers(balance, algorithm=algorithm)
 
     def deepCopy(self):
         state = GameState(prevState=self)
@@ -74,18 +74,33 @@ class GameState:
         state.player_queue = deque(self.player_queue)
         return state
 
-    def initializePlayers(self, balance, algorithm="random") -> None:
+    def initializePlayers(self, algorithm="mcts_vs_uniform", MCTS_iterations=None) -> None:
         '''
         Deal two cards to each player, and initialize the players array.
-        balance: initial balance each player has
-        ante: the price of the entrance ticket
+
+        Args:
+            algorithm:
+                Algorithm to use for each player
+            MCTS_iterations:
+                integer or List[integer]. 
+                When algorithm is "mcts_vs_random" or "mcts_vs_uniform", MCTS_iterations should be an integer
+                When algorithm is "mcts_vs_mcts", MCTS_iterations should be a list of integer of length 2
         '''
-        if algorithm == "compare":
-            self.players = [MCTSAgent(balance, 0, 0, True), RandomAgent(balance, 1, 0, True)]
-        elif algorithm == "mcts":
-            self.players = [MCTSAgent(balance, i, 0, True) for i in range(self.n_players)]
+        if algorithm == "random_vs_uniform":
+            self.players = [RandomAgent(self.balance, 0, 0, True), RandomAgent(self.balance, 1, 0, True, is_uniform=True)]
+        elif algorithm == "mcts_vs_random":
+            self.players = [MCTSAgent(self.balance, 0, 0, True, MCTS_iterations), RandomAgent(self.balance, 1, 0, True)]
+        elif algorithm == "mcts_vs_uniform":
+            self.players = [MCTSAgent(self.balance, 0, 0, True, MCTS_iterations), RandomAgent(self.balance, 1, 0, True, is_uniform=True)]
+        elif algorithm == "mcts_vs_mcts":
+            if MCTS_iterations is None:
+                self.players = [MCTSAgent(self.balance, i, 0, True) for i in range(self.n_players)]
+            else:  
+                if type(MCTS_iterations) is not list or len(MCTS_iterations) < 2:
+                    raise Exception("mcts_vs_mcts only accepts list of length 2")
+                self.players = [MCTSAgent(self.balance, i, 0, True, MCTS_iterations[i]) for i in range(self.n_players)]
         else:
-            self.players = [RandomAgent(balance, i, 0, True) for i in range(self.n_players)]
+            self.players = [RandomAgent(self.balance, i, 0, True) for i in range(self.n_players)]
 
     def initialize_game_state(self):
         # Reset game state

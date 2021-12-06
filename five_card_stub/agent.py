@@ -24,8 +24,9 @@ class AbstractPlayer:
 
 class RandomAgent(AbstractPlayer):
 
-    def __init__(self, balance, index, chip, alive):
+    def __init__(self, balance, index, chip, alive, is_uniform=False):
         super(RandomAgent, self).__init__(balance, index, chip, alive)
+        self.is_uniform = is_uniform
     
     def deepCopy(self):
         '''
@@ -49,23 +50,27 @@ class RandomAgent(AbstractPlayer):
             return Actions.CHECK, 0
 
         raise_chip = 0
-        if game.repeat:
-            allow_actions = [Actions.FOLD, Actions.CALL]
-            action = random.choices(allow_actions, [1, 2])[0]
-
+        if self.is_uniform:
+            allow_actions = game.get_allow_actions()
+            action = random.choice(allow_actions)
         else:
-            if self.chip == game.current_max_chips:
-                allow_actions = [Actions.CHECK, Actions.FOLD, Actions.RAISE, Actions.ALL_IN]
-                action = random.choices(allow_actions, [10, 0, 3, 1])[0]
-            elif game.current_max_chips == game.max_chips: # there are players have all-in
+            if game.repeat:
                 allow_actions = [Actions.FOLD, Actions.CALL]
-                action = random.choices(allow_actions, [2, 3])[0]
-            else: # there are players have raised
-                allow_actions = [Actions.FOLD, Actions.CALL, Actions.RAISE, Actions.ALL_IN]
-                action = random.choices(allow_actions, [1, 8, 3, 1])[0]
+                action = random.choices(allow_actions, [1, 2])[0]
 
-            if action == Actions.RAISE:
-                raise_chip = 10 # fix the raised amount
+            else:
+                if self.chip == game.current_max_chips:
+                    allow_actions = [Actions.CHECK, Actions.FOLD, Actions.RAISE, Actions.ALL_IN]
+                    action = random.choices(allow_actions, [10, 0, 3, 1])[0]
+                elif game.current_max_chips == game.max_chips: # there are players have all-in
+                    allow_actions = [Actions.FOLD, Actions.CALL]
+                    action = random.choices(allow_actions, [2, 3])[0]
+                else: # there are players have raised
+                    allow_actions = [Actions.FOLD, Actions.CALL, Actions.RAISE, Actions.ALL_IN]
+                    action = random.choices(allow_actions, [1, 8, 3, 1])[0]
+
+        if action == Actions.RAISE:
+            raise_chip = 10 # fix the raised amount
 
         return action, raise_chip
 

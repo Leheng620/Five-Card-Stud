@@ -8,7 +8,7 @@ import random
 
 CARD_DECK = create_half_deck()
 class MCTSAgent(RandomAgent):
-    def __init__(self, balance=100, index=0, chip=0, alive=True):
+    def __init__(self, balance=100, index=0, chip=0, alive=True, n_iterations=100):
         '''
         Args:
             root_state:  the game state before each betting round
@@ -17,7 +17,7 @@ class MCTSAgent(RandomAgent):
         self.root_state = None
         self.root_node = None
         self.node_count = 0   # The number of node in the tree
-        self.n_iterations = 500
+        self.n_iterations = n_iterations
     
     def deepCopy(self):
         '''
