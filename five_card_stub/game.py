@@ -3,13 +3,18 @@ from agent import *
 from card import *
 from collections import Counter
 from constants import debug
+import sys
 
 
-def play_game(t):
+def play_game(algorithm, MCTS_iterations=None):
     '''
     Return the winner index
     '''
-    game = GameState(algorithm="compare", balance=50)
+    # Initialize game states
+    game = GameState(balance=100)
+    # Initialize players based on algorithm
+    game.initializePlayers(algorithm=algorithm, MCTS_iterations=MCTS_iterations)
+
     game_count = 0
     while True:
         game_count += 1
@@ -41,17 +46,26 @@ def play_game(t):
     balances = [p.balance for p in game.players]
     return balances.index(max(balances))
 
-def main(debug=0):
+def main(algorithm="mcts_vs_uniform", MCTS_iterations=None, debug=0):
     Debug.debug = debug
     winner_lst = []
-    for i in range(1000):
-        winner = play_game()
+    for _ in range(100):
+        winner = play_game(algorithm, MCTS_iterations)
         winner_lst.append(winner)
-        if i % 10 == 0:
-            print(Counter(winner_lst))
 
     counter = Counter(winner_lst)
     print(counter)
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) == 1:
+        main()
+    elif len(sys.argv) == 2 and sys.argv[1] == "random_vs_uniform":
+        main(algorithm=sys.argv[1])
+    elif len(sys.argv) == 3 and (sys.argv[1] == "mcts_vs_uniform" or sys.argv[1] == "mcts_vs_random" ):
+        main(algorithm=sys.argv[1], MCTS_iterations=int(sys.argv[2]))
+    elif len(sys.argv) == 4 and sys.argv[1] == "mcts_vs_mcts":
+        MCTS_iterations = [int(sys.argv[2]), int(sys.argv[3])]
+        print(MCTS_iterations)
+        main(algorithm=sys.argv[1], MCTS_iterations=MCTS_iterations)
+    else:
+        raise Exception("invalid arguments!")
