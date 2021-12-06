@@ -102,7 +102,7 @@ class NodeMeta:
     INF = math.inf
     N_ITERATIONS = int(1e5)
 
-# ----------------------------- mcts -------------------------------
+# -----------------------------probability table-------------------------------
 
 # not_call_probability[number_of_cards] =
 # [weight of losing prob, weight of current highest chip / chip cap, weight of current highest chip / balance]
@@ -144,6 +144,8 @@ def make_decision_using_probability(prob):
         return True
     return False
 
+# ----------------------------- util ------------------------------
+
 class Debug:
     debug = 0
 
@@ -151,3 +153,8 @@ def debug(*msg, sep=' ', end='\n'):
     if Debug.debug == 1:
         print("[DEBUG] ", end='')
         print(*msg, sep=sep, end=end)
+
+
+# -----------------------------------------------------------
+TWENTY_EIGHT_CHOOSE_FIVE = 98280 # 28 CHOOSE 5
+CHANCE_NODE = 'chance_node' # directory name

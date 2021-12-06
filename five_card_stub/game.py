@@ -41,8 +41,8 @@ def play_game(t):
     balances = [p.balance for p in game.players]
     return balances.index(max(balances))
 
-def main(debug=0):
-    Debug.debug = debug
+def main(debug_flag=0):
+    Debug.debug = debug_flag
     winner_lst = []
     for i in range(1000):
         winner = play_game()
