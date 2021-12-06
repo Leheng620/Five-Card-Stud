@@ -49,7 +49,7 @@ def play_game(algorithm, MCTS_iterations=None):
 def main(algorithm="mcts_vs_uniform", MCTS_iterations=None, debug=0):
     Debug.debug = debug
     winner_lst = []
-    for _ in range(100):
+    for _ in range(1000):
         winner = play_game(algorithm, MCTS_iterations)
         winner_lst.append(winner)
 
