@@ -4,6 +4,7 @@ from card import *
 from collections import Counter
 from constants import debug
 import sys
+import tqdm
 
 
 def play_game(algorithm, MCTS_iterations=None):
@@ -50,7 +51,7 @@ def play_game(algorithm, MCTS_iterations=None):
 def main(algorithm="mcts_vs_uniform", MCTS_iterations=None, debug_flag=0):
     Debug.debug = debug_flag
     winner_lst = []
-    for _ in range(1000):
+    for _ in tqdm.tqdm(range(1000)):
         winner = play_game(algorithm, MCTS_iterations)
         winner_lst.append(winner)
 
