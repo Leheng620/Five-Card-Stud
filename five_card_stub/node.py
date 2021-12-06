@@ -12,9 +12,10 @@ class Node:
         'U',
         'children',
         'outcome',
-        'actions_not_expanded']
+        'actions_not_expanded',
+        'C']
         
-    def __init__(self, node_id, action=None, parent=None, player_id=None):
+    def __init__(self, node_id, action=None, parent=None, player_id=None, C=sqrt(2)):
         '''
         Args:
             action:     the action taken at the parent node (which leads to this node)
@@ -34,6 +35,7 @@ class Node:
         self.children = {}  
         self.outcome = None
         self.actions_not_expanded = None
+        self.C = C
 
     def set_player_id(self, id):
         self.player_id = id
@@ -65,6 +67,6 @@ class Node:
         if self.N == 0:
             return NodeMeta.INF
         else:
-            return self.U / self.N + NodeMeta.C * sqrt(log(self.parent.N) / self.N)
+            return self.U / self.N + self.C * sqrt(log(self.parent.N) / self.N)
 
     

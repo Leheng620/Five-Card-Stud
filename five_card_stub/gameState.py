@@ -3,6 +3,7 @@ from card import *
 import random
 from collections import deque
 from mctsAgent import MCTSAgent
+from math import sqrt
 
 class GameState:
     def __init__(self, n_players=2, balance=100, ante=5, prevState=None):
@@ -98,7 +99,8 @@ class GameState:
             else:  
                 if type(MCTS_iterations) is not list or len(MCTS_iterations) < 2:
                     raise Exception("mcts_vs_mcts only accepts list of length 2")
-                self.players = [MCTSAgent(self.balance, i, 0, True, MCTS_iterations[i]) for i in range(self.n_players)]
+                self.players = [MCTSAgent(self.balance, 0, 0, True, n_iterations=MCTS_iterations[0], C=1/sqrt(2)), 
+                                MCTSAgent(self.balance, 1, 0, True, n_iterations=MCTS_iterations[1], C=sqrt(2))]
         else:
             self.players = [RandomAgent(self.balance, i, 0, True) for i in range(self.n_players)]
 
@@ -321,16 +323,6 @@ class GameState:
             if p.balance < self.ante:
                 return True
         return False
-
-
-    # def get_simulated_winner(self, player):
-    #     alive_p = self.get_alive_players()
-    #     if len(alive_p) == 1:
-    #         return alive_p[0].index
-    #
-    #     alive_p.sort(key=cmp_func_map[5])
-    #     return alive_p[-1].index
-
 
     # Get methods
     def get_player_queue(self):

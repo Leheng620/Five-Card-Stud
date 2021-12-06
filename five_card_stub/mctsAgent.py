@@ -5,10 +5,11 @@ from node import Node
 from card import cmp_two_cards, cmp_three_cards, cmp_four_cards, cmp_five_cards, create_half_deck
 import numpy as np
 import random
+from math import sqrt
 
 CARD_DECK = create_half_deck()
 class MCTSAgent(RandomAgent):
-    def __init__(self, balance=100, index=0, chip=0, alive=True, n_iterations=100):
+    def __init__(self, balance=100, index=0, chip=0, alive=True, n_iterations=100, C=sqrt(2)):
         '''
         Args:
             root_state:  the game state before each betting round
@@ -18,12 +19,13 @@ class MCTSAgent(RandomAgent):
         self.root_node = None
         self.node_count = 0   # The number of node in the tree
         self.n_iterations = n_iterations
+        self.C = C
     
     def deepCopy(self):
         '''
         Deepcopy the player object
         '''
-        state = MCTSAgent(self.balance, self.index, self.chip, self.alive)
+        state = MCTSAgent(self.balance, self.index, self.chip, self.alive, C=self.C)
         state.cards = [card.copy() for card in self.cards]
         state.revealed_cards = state.cards[1:]
         state.__secret_card = state.cards[0]
@@ -32,7 +34,7 @@ class MCTSAgent(RandomAgent):
     def decide_action(self, game):
         # if game.round < 4: return Actions.CHECK, 0
         self.root_state = game.deepCopy()                            # Deepcopy the current game state
-        self.root_node = Node(self.node_count, None, None, self.index)      # Root Node: current game state
+        self.root_node = Node(self.node_count, None, None, self.index, C=self.C)      # Root Node: current game state
         self.node_count = 0
         for _ in range(self.n_iterations):
             # Keep selecting best child node until the leaf node
@@ -57,7 +59,6 @@ class MCTSAgent(RandomAgent):
         raise_chip = calculate_prob_weight_given_actions(self.root_state.get_current_player(),
                                                          [action], self.root_state)[1]
 
-        # game.print_cards()
         return action, raise_chip
 
     def check_game_state_and_act(self, state, action):
@@ -113,7 +114,7 @@ class MCTSAgent(RandomAgent):
         if node.actions_not_expanded is None:
             node.actions_not_expanded = state.get_allow_actions()
             for action in node.actions_not_expanded:
-                child = Node(self.node_count, action, node)
+                child = Node(self.node_count, action, node, C=self.C)
                 child.set_player_id(state.get_next_player().index)
                 self.node_count += 1
                 node.add_child(action, child)
