@@ -6,6 +6,8 @@ from constants import debug
 import sys
 import tqdm
 
+from mctsAgent import MCTSAgent2, MCTSAgent
+
 
 def play_game(algorithm, MCTS_iterations=None):
     '''
@@ -14,7 +16,8 @@ def play_game(algorithm, MCTS_iterations=None):
     # Initialize game states
     game = GameState(balance=100)
     # Initialize players based on algorithm
-    game.initializePlayers(algorithm=algorithm, MCTS_iterations=MCTS_iterations)
+    game.players = [MCTSAgent2(game.balance, 0, 0, True, n_iterations=MCTS_iterations[0]), 
+                    RandomAgent(game.balance, 1, 0, True)]
 
     game_count = 0
     while True:
@@ -38,7 +41,7 @@ def play_game(algorithm, MCTS_iterations=None):
             if game.is_game_end():
                 debug("player %d wins %d chips!" % (game.get_winner(), game.total_chips))
                 game.checkout()
-                # game.print_results()
+                # game.print_all_player_balance()
                 break
             else:
                 game.deal()
@@ -51,9 +54,13 @@ def play_game(algorithm, MCTS_iterations=None):
 def main(algorithm="mcts_vs_uniform", MCTS_iterations=None, debug_flag=0):
     Debug.debug = debug_flag
     winner_lst = []
+    lst = [0, 0]
     for _ in tqdm.tqdm(range(1000)):
         winner = play_game(algorithm, MCTS_iterations)
         winner_lst.append(winner)
+        lst[winner] += 1
+        print()
+        print(lst)
 
     counter = Counter(winner_lst)
     print(counter)

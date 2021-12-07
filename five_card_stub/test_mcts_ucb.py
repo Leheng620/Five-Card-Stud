@@ -16,7 +16,7 @@ from statistics import mean
 import matplotlib.pyplot as plt
 import seaborn as sns
 from math import sqrt
-from mctsAgent import MCTSAgent
+from mctsAgent import MCTSAgent2, MCTSAgent
 import numpy as np
 sns.set()
 
@@ -29,7 +29,7 @@ def play_game(C=sqrt(2), time_record=None, ):
     # Initialize game states
     game = GameState(balance=100)
     # Initialize players based on algorithm
-    game.players = [MCTSAgent(game.balance, 0, 0, True, n_iterations=100, C=C), 
+    game.players = [MCTSAgent2(game.balance, 0, 0, True, n_iterations=100, C=C), 
                     RandomAgent(game.balance, 1, 0, True, False)]
 
     game_count = 0
@@ -60,7 +60,7 @@ def play_game(C=sqrt(2), time_record=None, ):
             if game.is_game_end():
                 debug("player %d wins %d chips!" % (game.get_winner(), game.total_chips))
                 game.checkout()
-                # game.print_results()
+                # game.print_all_player_balance()
                 break
             else:
                 game.deal()
@@ -71,18 +71,18 @@ def play_game(C=sqrt(2), time_record=None, ):
 
 def main(debug=0):
     Debug.debug = debug
-    C_range = np.arange(0.1, 3.1, 0.1)
+    C_range = np.arange(1, 2, 10)
     n_runs = 1000
-    win_times = [0 for _ in range(len(C_range))] # win times of MCTS Agent
-    mean_time_record = [0 for _ in range(len(C_range))] # win times of MCTS Agent
+    win_times = np.zeros(len(C_range)) # win times of MCTS Agent
+    mean_time_record = np.zeros(len(C_range)) # win times of MCTS Agent
     for i in range(len(C_range)):
         # Time record for MCTS agent
-        time_record = [] 
+        time_record = np.zeros(n_runs)
         for _ in range(n_runs):
             winner = play_game(C=C_range[i], time_record=time_record)
             if winner == 0:
                 win_times[i] += 1
-        mean_time_record[i] = mean(time_record)
+        mean_time_record[i] = np.mean(time_record)
 
     print("win_times", win_times)
     print("mean_time_record", mean_time_record)
@@ -95,7 +95,7 @@ def main(debug=0):
     plt.title("Average time of play vs. C")
     plt.xlabel("C")
     plt.ylabel("Average time of play")
-    plt.plot(C_range, mean_time_record)
+    plt.plot(C_range, mean_time_record/1e9)
     plt.show()
 
 if __name__ == "__main__":

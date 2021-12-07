@@ -1,5 +1,5 @@
 from agent import RandomAgent
-from constants import Actions, NodeMeta, add_chip_amount, not_call_probability, not_raise_probability,\
+from constants import Actions, add_chip_amount, not_call_probability, not_raise_probability,\
     make_decision_using_probability, debug
 from node import Node
 from card import cmp_two_cards, cmp_three_cards, cmp_four_cards, cmp_five_cards, create_half_deck
@@ -48,7 +48,7 @@ class MCTSAgent(RandomAgent):
             winner_id = self.simulation(child, state)
 
             # Back-propogate from child to root
-            self.back_propagate(winner_id, child)
+            self.back_propagate(winner_id, child, state)
 
         # for child in self.root_node.children.values():
         #     debug(child.node_id, child.action, child.N, child.U)
@@ -161,7 +161,7 @@ class MCTSAgent(RandomAgent):
             curr_player.act(state, action_tup)
             state.pop_get_next_player()        
     
-    def back_propagate(self, winner_id, leaf):
+    def back_propagate(self, winner_id, leaf, state):
         node = leaf
         while node is not None:
             node.N += 1
@@ -290,4 +290,20 @@ def create_remaining_card_deck(player, other_players_objs):
             cards.append(card)
     return cards
 
+
+class MCTSAgent2(MCTSAgent):
+    def __init__(self, balance=100, index=0, chip=0, alive=True, n_iterations=100, C=sqrt(2)):
+        super().__init__(balance, index, chip, alive, n_iterations, C)
+
+    def back_propagate(self, winner_id, leaf, state):
+        node = leaf
+        while node is not None:
+            node.N += 1
+            if node.parent is not None:
+                if node.parent.player_id == winner_id:
+                    node.U += state.total_chips
+                elif node.parent.player_id == 1 - winner_id:
+                    node.U -= self.chip
+            node = node.parent
+    
         

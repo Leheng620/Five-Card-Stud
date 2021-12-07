@@ -1,5 +1,5 @@
 from humanAgent import HumanAgent
-from mctsAgent import MCTSAgent
+from mctsAgent import MCTSAgent2
 from gameState import GameState
 from agent import *
 from card import *
@@ -16,7 +16,7 @@ def play_game(MCTS_iterations=100):
     game = GameState(balance=100)
     # Initialize players based on algorithm
     game.players = [HumanAgent(game.balance, 0, 0, True), 
-                    MCTSAgent(game.balance, 1, 0, True, n_iterations=MCTS_iterations)]
+                    MCTSAgent2(game.balance, 1, 0, True, n_iterations=MCTS_iterations)]
 
 
     game_count = 0
@@ -40,9 +40,11 @@ def play_game(MCTS_iterations=100):
             game.print_all_player_balance()
             if game.is_game_end():
                 debug("[Game End] Player %d wins %d chips!" % (game.get_winner(), game.total_chips))
+                if game.get_winner() == 0:
+                    print("Congratulation! You win")
                 game.print_cards()
                 game.checkout()
-                game.print_results()
+                game.print_all_player_balance()
                 break
             else:
                 game.deal()

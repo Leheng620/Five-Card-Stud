@@ -358,9 +358,5 @@ class GameState:
         Print the balance of each player
         '''
         for p in self.players:
-            debug("Player %d balance is %d" % (p.index, p.balance))
+            debug("[Player %d] balance %d" % (p.index, p.balance))
 
-    def print_results(self):
-        debug("Results:")
-        for p in self.players:
-            debug("[Player %d] balance: %d" % (p.index, p.balance))

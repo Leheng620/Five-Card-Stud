@@ -60,7 +60,7 @@ def play_game(algorithm, MCTS_iterations=None):
             if game.is_game_end():
                 debug("player %d wins %d chips!" % (game.get_winner(), game.total_chips))
                 game.checkout()
-                # game.print_results()
+                # game.print_all_player_balance()
                 break
             else:
                 game.deal()
