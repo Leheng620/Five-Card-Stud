@@ -132,7 +132,7 @@ def calculate_win_rate(all_card_type):
     with open(os.path.join(CHANCE_NODE, "5_cards_win_rate.obj"), 'wb') as f:
         pickle.dump(five_cards_win_rate, f)
 
-
+        
 def load_win_rate():
     with open(os.path.join(CHANCE_NODE, "2_cards_win_rate.obj"), 'rb') as f:
         two_cards_win_rate = pickle.load(f)

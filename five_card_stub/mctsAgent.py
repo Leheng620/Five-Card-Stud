@@ -50,8 +50,8 @@ class MCTSAgent(RandomAgent):
             # Back-propogate from child to root
             self.back_propagate(winner_id, child)
 
-        for child in self.root_node.children.values():
-            debug(child.node_id, child.action, child.N, child.U)
+        # for child in self.root_node.children.values():
+        #     debug(child.node_id, child.action, child.N, child.U)
         values = [child.value for child in self.root_node.children.values()]
         child = random.choice([child for child in self.root_node.children.values() if child.value == max(values)])
         action = child.action

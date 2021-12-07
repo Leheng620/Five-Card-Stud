@@ -3,7 +3,6 @@ from card import *
 import random
 from collections import deque
 from mctsAgent import MCTSAgent
-from math import sqrt
 
 class GameState:
     def __init__(self, n_players=2, balance=100, ante=5, prevState=None):
@@ -99,8 +98,7 @@ class GameState:
             else:  
                 if type(MCTS_iterations) is not list or len(MCTS_iterations) < 2:
                     raise Exception("mcts_vs_mcts only accepts list of length 2")
-                self.players = [MCTSAgent(self.balance, 0, 0, True, n_iterations=MCTS_iterations[0], C=1/sqrt(2)), 
-                                MCTSAgent(self.balance, 1, 0, True, n_iterations=MCTS_iterations[1], C=sqrt(2))]
+                self.players = [MCTSAgent(self.balance, i, 0, True, n_iterations=MCTS_iterations[i]) for i in range(2)]
         else:
             self.players = [RandomAgent(self.balance, i, 0, True) for i in range(self.n_players)]
 
@@ -331,7 +329,19 @@ class GameState:
     def get_alive_players(self):
         return [self.players[i] for i in self.alive_indices]
 
+
     # Functions for debugging
+    def print_revealed_cards(self):
+        '''
+        Helper function for debugging
+        '''
+        debug("------------------------------")
+        for p in self.players:
+            debug("Player %d" % p.index)
+            for c in p.revealed_cards:
+                debug(str(c), sep=', ', end='; ')
+            debug()
+
     def print_cards(self):
         '''
         Helper function for debugging
@@ -342,12 +352,15 @@ class GameState:
             for c in p.cards:
                 debug(str(c), sep=', ', end='; ')
             debug()
+    
+    def print_all_player_balance(self):
+        '''
+        Print the balance of each player
+        '''
+        for p in self.players:
+            debug("Player %d balance is %d" % (p.index, p.balance))
 
     def print_results(self):
-        print("Results:")
+        debug("Results:")
         for p in self.players:
-            print("[Player %d] balance: %d" % (p.index, p.balance))
-
-
-
-
+            debug("[Player %d] balance: %d" % (p.index, p.balance))

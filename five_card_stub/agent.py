@@ -1,4 +1,4 @@
-from constants import Actions
+from constants import Actions, debug
 import random
 
 class AbstractPlayer:
@@ -79,7 +79,7 @@ class RandomAgent(AbstractPlayer):
         Decide an action and act it
         '''
         action_tup = self.decide_action(game)
-        # print("[debug] player %d, action: %s, raise_chip: %d" % (self.index, action_tup[0], action_tup[1]))
+        debug("player %d, action: %s, raise_chip: %d" % (self.index, action_tup[0], action_tup[1]))
         self.act(game, action_tup)
 
     def act(self, game, action_tup):
@@ -118,6 +118,9 @@ class RandomAgent(AbstractPlayer):
         self.cards = card_pair
         self.__secret_card = self.cards[0] # the face-down card, only self can access
         self.revealed_cards = self.cards[1:] # the cards being revealed to other players
+    
+    def print_secret_card(self):
+        print("Your secret card is", str(self.__secret_card))
 
     
 

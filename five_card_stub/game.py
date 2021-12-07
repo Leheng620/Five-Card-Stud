@@ -30,8 +30,8 @@ def play_game(algorithm, MCTS_iterations=None):
             while True:
                 player = game.pop_get_next_player()
                 player.play(game)
-                debug("total_chips:", game.total_chips, "current_max_chips:",game.current_max_chips,
-                    "player:", player.index, "balance:", player.balance)
+                # debug("total_chips:", game.total_chips, "current_max_chips:",game.current_max_chips,
+                #     "player:", player.index, "balance:", player.balance)
                 if game.is_round_end():
                     break
             game.end_betting_round()
