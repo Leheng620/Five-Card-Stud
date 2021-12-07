@@ -12,16 +12,18 @@ from agent import *
 from card import *
 from constants import debug
 import time
-from statistics import mean
 import matplotlib.pyplot as plt
 import seaborn as sns
 from math import sqrt
-from mctsAgent import MCTSAgent2, MCTSAgent
+from mctsAgent import MCTSAgent2
 import numpy as np
+import tqdm
+from statistics import mean
 sns.set()
 
 
-def play_game(C=sqrt(2), time_record=None, ):
+
+def play_game(C, time_record):
     '''
     Return the winner index
     '''
@@ -50,7 +52,7 @@ def play_game(C=sqrt(2), time_record=None, ):
                 player.play(game)
                 end = time.time_ns()
                 # record time taken for MCTS agent to play
-                if time_record != None and player.index == 0:
+                if player.index == 0:
                     time_record.append(end - start)
                 debug("total_chips:", game.total_chips, "current_max_chips:",game.current_max_chips,
                     "player:", player.index, "balance:", player.balance)
@@ -77,12 +79,13 @@ def main(debug=0):
     mean_time_record = np.zeros(len(C_range)) # win times of MCTS Agent
     for i in range(len(C_range)):
         # Time record for MCTS agent
-        time_record = np.zeros(n_runs)
-        for _ in range(n_runs):
+        print("Test C=", C_range[i])
+        time_record = []
+        for _ in tqdm.tqdm(range(n_runs)):
             winner = play_game(C=C_range[i], time_record=time_record)
             if winner == 0:
                 win_times[i] += 1
-        mean_time_record[i] = np.mean(time_record)
+        mean_time_record[i] = mean(time_record)
 
     print("win_times", win_times)
     print("mean_time_record", mean_time_record)
