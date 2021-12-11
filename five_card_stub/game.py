@@ -20,7 +20,6 @@ def play_game(algorithm, MCTS_iterations=None):
 
     game_count = 0
     while True:
-        game.print_information_set()
         game_count += 1
         # print("*************************************************")
         # print("Game %d starts..." % game_count)
@@ -35,7 +34,6 @@ def play_game(algorithm, MCTS_iterations=None):
                 player.play(game)
                 # debug("total_chips:", game.total_chips, "current_max_chips:",game.current_max_chips,
                 #     "player:", player.index, "balance:", player.balance)
-                game.print_information_set()
                 if game.is_round_end():
                     break
             game.end_betting_round()
@@ -52,7 +50,7 @@ def play_game(algorithm, MCTS_iterations=None):
     return balances.index(max(balances))
 
 
-def main(algorithm="mcts_vs_uniform", MCTS_iterations=None, debug_flag=0):
+def main(algorithm="mcts_vs_uniform", MCTS_iterations=100, debug_flag=0):
     Debug.debug = debug_flag
     winner_lst = []
     lst = [0, 0]

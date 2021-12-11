@@ -2,31 +2,34 @@ from agent import RandomAgent
 from card import *
 import random
 from collections import deque
-from infomation_set import information_set
 from mctsAgent import MCTSAgent
 
 class GameState:
     def __init__(self, n_players=2, balance=100, ante=5, prevState=None):
         '''
-        round:          rounds of card dealing so far
-                        round 0 => two cards each player
-                        rount 1-3 => one card each player
-        players:        all the players
-        alive_indices:  indecies of players still alive, initially [0, n_players-1]
-        player_queue:   queue of players indices (in the order of play in the current betting round)
-        total_chips:    the total number of chips on the table (including chips put in by both alive or not alive players)
-        max_chips:      the maximum number of chips can be put in by a player (the all-in amount)
-        current_max_chips: The max chips on the table in the current round. If any player has chips that is less than
-                        current_max_chips, the player can't check. Alive players have to
-                        put in the same number (in total) to stay alive
-        used_cards:     The cards that have been dealt to players.
-        first_player:   Index of the player with best cards (among the alive players), 
-                        betting & dealling start from this player
-        ante:           The price of the entrance ticket
-        repeat:         Bool. repeat is set to False at the beginning of each betting round;
-                        set to True when all the players has been processed once
-        num_alive_players_not_been_processed:     
-                        the number of players that have not taken an action yet
+        Args: 
+            round:          rounds of card dealing so far
+                            round 0 => two cards each player
+                            rount 1-3 => one card each player
+            n_players:      number of players
+            players:        all the players
+            alive_indices:  indecies of players still alive, initially [0, n_players-1]
+            player_queue:   queue of players indices (in the order of play in the current betting round)
+            total_chips:    the total number of chips on the table (including chips put in by both alive or not alive players)
+            max_chips:      the maximum number of chips can be put in by a player (the all-in amount)
+            current_max_chips: 
+                            The max chips on the table in the current round. If any player has chips that is less than
+                            current_max_chips, the player can't check. Alive players have to
+                            put in the same number (in total) to stay alive
+            used_cards:     The cards that have been dealt to players.
+            first_player:   Index of the player with best cards (among the alive players), 
+                            betting & dealling start from this player
+            ante:           The price of the entrance ticket, will be taken from each player's balance at the beginning of 
+                            each game
+            repeat:         Bool. repeat is set to False at the beginning of each betting round;
+                            set to True when all the players has been processed once
+            num_alive_players_not_been_processed:     
+                            the number of players that have not taken an action yet
         '''
         if prevState != None:
             self.round = prevState.round
@@ -45,7 +48,7 @@ class GameState:
             self.repeat = prevState.repeat
             self.num_alive_players_not_been_processed = prevState.num_alive_players_not_been_processed
             self.first_player = prevState.first_player
-            self.information_set = prevState.information_set
+
         else:
             self.round = 1
             self.n_players = n_players
@@ -64,9 +67,11 @@ class GameState:
             self.repeat = False
             self.num_alive_players_not_been_processed = 0
             self.first_player = None
-            self.information_set = information_set()  # List of strings, representing histories
 
     def deepCopy(self):
+        '''
+        Deep copy the current game state
+        '''
         state = GameState(prevState=self)
         state.players = [player.deepCopy() for player in self.players]
         state.alive_indices = [i for i in self.alive_indices]
@@ -74,7 +79,6 @@ class GameState:
         for c in self.used_card:
             state.used_card.add(c)
         state.player_queue = deque(self.player_queue)
-        state.information_set = self.information_set.deepCopy()
         return state
 
     def initializePlayers(self, algorithm="mcts_vs_uniform", MCTS_iterations=None) -> None:
@@ -132,8 +136,6 @@ class GameState:
             for i in self.alive_indices:
                 top_card = self.generate_random_card()
                 init_card_pairs[i].append(top_card)
-                # Record new card in information set
-                self.information_set.encode_and_insert(True, i, top_card)
         for i, p in enumerate(self.players):
             p.alive = True
             p.set_init_cards(init_card_pairs[i])
@@ -168,7 +170,6 @@ class GameState:
             player = self.players[i]
             top_card = self.generate_random_card()
             player.append_card(top_card)
-            self.information_set.encode_and_insert(True, i, top_card)
         
         self.round += 1
 
@@ -248,10 +249,6 @@ class GameState:
          
         self.num_alive_players_not_been_processed -= 1
 
-        # Record the player action in information set
-        action_tup = ActionTuple(action, raise_chip)
-        self.information_set.encode_and_insert(False, player_id, action_tup)
-
     # Conditions for a round/game to end
     def is_round_end(self):
         '''
@@ -308,13 +305,6 @@ class GameState:
                     return [Actions.FOLD, Actions.CALL]
                 else:
                     return [Actions.FOLD, Actions.CALL, Actions.RAISE]
-                # if player.balance > self.current_max_chips - player.chip:
-                #     return [Actions.FOLD, Actions.CALL, Actions.RAISE]
-                # elif player.balance == self.current_max_chips - player.chip:
-                #     return [Actions.FOLD, Actions.CALL]
-                # else:
-                #     return [Actions.FOLD]
-
 
     def is_game_end(self):
         return self.round == 4 or len(self.alive_indices) < 2
@@ -338,13 +328,6 @@ class GameState:
 
     def get_alive_players(self):
         return [self.players[i] for i in self.alive_indices]
-
-    def get_information_set(self):
-        return self.information_set
-
-    # Functions for debugging
-    def print_information_set(self):
-        print(self.information_set.information)
         
     def print_revealed_cards(self):
         '''
@@ -374,6 +357,3 @@ class GameState:
         '''
         for p in self.players:
             debug("[Player %d] balance %d" % (p.index, p.balance))
-
-    
-
