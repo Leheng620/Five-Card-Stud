@@ -1,4 +1,4 @@
-
+from constants import A
 
 def init_sigma(node, output = None):
     output = dict()
