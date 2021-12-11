@@ -73,15 +73,15 @@ def play_game(C, time_record):
 
 def main(debug=0):
     Debug.debug = debug
-    C_range = np.arange(1, 2, 10)
+    C_range = np.arange(1, 10)
     n_runs = 1000
     win_times = np.zeros(len(C_range)) # win times of MCTS Agent
     mean_time_record = np.zeros(len(C_range)) # win times of MCTS Agent
-    for i in range(len(C_range)):
+    for i in tqdm.tqdm(range(len(C_range))):
         # Time record for MCTS agent
         print("Test C=", C_range[i])
         time_record = []
-        for _ in tqdm.tqdm(range(n_runs)):
+        for _ in range(n_runs):
             winner = play_game(C=C_range[i], time_record=time_record)
             if winner == 0:
                 win_times[i] += 1
