@@ -2,6 +2,9 @@ import random
 from enum import Enum
 import math
 
+INF = math.inf
+INIT_BALANCE = 100
+
 # Map number(1-52) to 52 cards
 card_suit = {
     0: 'spades',
@@ -96,12 +99,39 @@ class Actions(Enum):
     ALL_IN = 3
     CALL = 4
 
+action_map = {
+    Actions.FOLD: 'f',
+    Actions.CHECK: 'c',
+    Actions.CALL: 'c',
+    Actions.RAISE: 'r',
+}
 
-# The constants in Node class
-class NodeMeta:
-    C = 1
-    INF = math.inf
-    N_ITERATIONS = int(1e5)
+# (lower_bound, upper_bound) -> #range
+# The amount should be in range of (Lower_bound, upper bound] 
+raise_amount_map = {
+    0.2: 0,
+    0.5: 1,
+    1: 2,
+}
+
+class ActionTuple():
+    def __init__(self, action, chips):
+        self.action = action
+        self.chips = chips
+        
+
+    def __str__(self):
+        res = action_map[self.action]
+        if self.action == Actions.RAISE:
+            ratio = self.chips / INIT_BALANCE
+            if ratio <= 0.2:
+                res += '0'
+            elif ratio <= 0.5:
+                res += '1'
+            else:
+                ratio += '2'
+            
+
 
 # -----------------------------probability table-------------------------------
 

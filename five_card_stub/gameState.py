@@ -44,6 +44,7 @@ class GameState:
             self.repeat = prevState.repeat
             self.num_alive_players_not_been_processed = prevState.num_alive_players_not_been_processed
             self.first_player = prevState.first_player
+            self.information_set = prevState.information_set
 
         else:
             self.round = 1
@@ -63,6 +64,7 @@ class GameState:
             self.repeat = False
             self.num_alive_players_not_been_processed = 0
             self.first_player = None
+            self.information_set = []  # List of strings, representing histories
 
     def deepCopy(self):
         state = GameState(prevState=self)

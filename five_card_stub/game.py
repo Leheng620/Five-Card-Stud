@@ -16,8 +16,8 @@ def play_game(algorithm, MCTS_iterations=None):
     # Initialize game states
     game = GameState(balance=100)
     # Initialize players based on algorithm
-    game.players = [MCTSAgent2(game.balance, 0, 0, True, n_iterations=MCTS_iterations[0]), 
-                    RandomAgent(game.balance, 1, 0, True)]
+    game.players = [MCTSAgent2(game.balance, 0, 0, True, n_iterations=MCTS_iterations[0], C=5), 
+                    MCTSAgent(game.balance, 1, 0, True, n_iterations=MCTS_iterations[1])]
 
     game_count = 0
     while True:

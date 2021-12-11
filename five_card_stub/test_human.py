@@ -58,7 +58,7 @@ def main(MCTS_iterations=None, debug_flag=0):
     Debug.debug = debug_flag
     winner_lst = []
     for _ in range(10):
-        winner = play_game(MCTS_iterations)
+        winner = play_game()
         winner_lst.append(winner)
 
     counter = Counter(winner_lst)
