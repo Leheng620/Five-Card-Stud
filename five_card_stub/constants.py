@@ -104,6 +104,7 @@ action_map = {
     Actions.CHECK: 'c',
     Actions.CALL: 'c',
     Actions.RAISE: 'r',
+    Actions.ALL_IN: 'r',
 }
 
 # (lower_bound, upper_bound) -> #range
@@ -129,7 +130,8 @@ class ActionTuple():
             elif ratio <= 0.5:
                 res += '1'
             else:
-                ratio += '2'
+                res += '2'
+        return res
             
 
 

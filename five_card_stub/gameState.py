@@ -2,6 +2,7 @@ from agent import RandomAgent
 from card import *
 import random
 from collections import deque
+from infomation_set import information_set
 from mctsAgent import MCTSAgent
 
 class GameState:
@@ -45,7 +46,6 @@ class GameState:
             self.num_alive_players_not_been_processed = prevState.num_alive_players_not_been_processed
             self.first_player = prevState.first_player
             self.information_set = prevState.information_set
-
         else:
             self.round = 1
             self.n_players = n_players
@@ -64,7 +64,7 @@ class GameState:
             self.repeat = False
             self.num_alive_players_not_been_processed = 0
             self.first_player = None
-            self.information_set = []  # List of strings, representing histories
+            self.information_set = information_set()  # List of strings, representing histories
 
     def deepCopy(self):
         state = GameState(prevState=self)
@@ -74,6 +74,7 @@ class GameState:
         for c in self.used_card:
             state.used_card.add(c)
         state.player_queue = deque(self.player_queue)
+        state.information_set = self.information_set.deepCopy()
         return state
 
     def initializePlayers(self, algorithm="mcts_vs_uniform", MCTS_iterations=None) -> None:
@@ -131,6 +132,8 @@ class GameState:
             for i in self.alive_indices:
                 top_card = self.generate_random_card()
                 init_card_pairs[i].append(top_card)
+                # Record new card in information set
+                self.information_set.encode_and_insert(True, i, top_card)
         for i, p in enumerate(self.players):
             p.alive = True
             p.set_init_cards(init_card_pairs[i])
@@ -165,6 +168,7 @@ class GameState:
             player = self.players[i]
             top_card = self.generate_random_card()
             player.append_card(top_card)
+            self.information_set.encode_and_insert(True, i, top_card)
         
         self.round += 1
 
@@ -243,6 +247,10 @@ class GameState:
             self.total_chips += chip_diff
          
         self.num_alive_players_not_been_processed -= 1
+
+        # Record the player action in information set
+        action_tup = ActionTuple(action, raise_chip)
+        self.information_set.encode_and_insert(False, player_id, action_tup)
 
     # Conditions for a round/game to end
     def is_round_end(self):
@@ -331,8 +339,13 @@ class GameState:
     def get_alive_players(self):
         return [self.players[i] for i in self.alive_indices]
 
+    def get_information_set(self):
+        return self.information_set
 
     # Functions for debugging
+    def print_information_set(self):
+        print(self.information_set.information)
+        
     def print_revealed_cards(self):
         '''
         Helper function for debugging
@@ -361,4 +374,6 @@ class GameState:
         '''
         for p in self.players:
             debug("[Player %d] balance %d" % (p.index, p.balance))
+
+    
 

@@ -1,6 +1,6 @@
-from constants import NodeMeta
 from math import sqrt, log
 import random
+from constants import INF
 
 class Node:
     __slots__ = [
@@ -65,7 +65,7 @@ class Node:
             raise Exception("Computation of UCB1 failed, parent is None");
         
         if self.N == 0:
-            return NodeMeta.INF
+            return INF
         else:
             return self.U / self.N + self.C * sqrt(log(self.parent.N) / self.N)
 

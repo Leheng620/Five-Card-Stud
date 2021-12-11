@@ -16,11 +16,11 @@ def play_game(algorithm, MCTS_iterations=None):
     # Initialize game states
     game = GameState(balance=100)
     # Initialize players based on algorithm
-    game.players = [MCTSAgent2(game.balance, 0, 0, True, n_iterations=MCTS_iterations[0], C=5), 
-                    MCTSAgent(game.balance, 1, 0, True, n_iterations=MCTS_iterations[1])]
+    game.initializePlayers(algorithm, MCTS_iterations)
 
     game_count = 0
     while True:
+        game.print_information_set()
         game_count += 1
         # print("*************************************************")
         # print("Game %d starts..." % game_count)
@@ -35,6 +35,7 @@ def play_game(algorithm, MCTS_iterations=None):
                 player.play(game)
                 # debug("total_chips:", game.total_chips, "current_max_chips:",game.current_max_chips,
                 #     "player:", player.index, "balance:", player.balance)
+                game.print_information_set()
                 if game.is_round_end():
                     break
             game.end_betting_round()

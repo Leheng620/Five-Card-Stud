@@ -1,7 +1,16 @@
 class information_set():
-    def __init__(self, ):
+    __slots__ = {
+        "information", "last_info",
+    }
+
+    def __init__(self):
         self.information = ""
         self.last_info = ""
+
+    def deepCopy(self):
+        info = information_set()
+        info.information = self.information
+        info.last_info = self.last_info
 
     def encode_and_insert(self, is_card, player_index, value):
         '''
