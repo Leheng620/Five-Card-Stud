@@ -54,21 +54,19 @@ def play_game(MCTS_iterations=100):
     return balances.index(max(balances))
 
 
-def main(MCTS_iterations=None, debug_flag=0):
+def main(debug_flag=0):
     Debug.debug = debug_flag
+    MCTS_iterations = int(input("Please input the number of iterations of MCTS2 agent: "))
     winner_lst = []
     for _ in range(10):
-        winner = play_game()
+        winner = play_game(MCTS_iterations)
         winner_lst.append(winner)
 
     counter = Counter(winner_lst)
     print(counter)
 
 if __name__ == "__main__":
-    if len(sys.argv) == 2:
-        main(MCTS_iterations=int(sys.argv[1]), debug_flag=1)
-    else:
-        main(debug_flag=1)
+    main(debug_flag=1)
         
 
 

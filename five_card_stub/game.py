@@ -6,8 +6,6 @@ from constants import debug
 import sys
 import tqdm
 
-from mctsAgent import MCTSAgent2, MCTSAgent
-
 
 def play_game(algorithm, MCTS_iterations=None):
     '''
@@ -21,8 +19,8 @@ def play_game(algorithm, MCTS_iterations=None):
     game_count = 0
     while True:
         game_count += 1
-        # print("*************************************************")
-        # print("Game %d starts..." % game_count)
+        debug("*************************************************")
+        debug("Game %d starts..." % game_count)
         game.initialize_game_state()
 
         while True:
@@ -32,15 +30,15 @@ def play_game(algorithm, MCTS_iterations=None):
             while True:
                 player = game.pop_get_next_player()
                 player.play(game)
-                # debug("total_chips:", game.total_chips, "current_max_chips:",game.current_max_chips,
-                #     "player:", player.index, "balance:", player.balance)
+                debug("total_chips:", game.total_chips, "current_max_chips:",game.current_max_chips,
+                    "player:", player.index, "balance:", player.balance)
                 if game.is_round_end():
                     break
             game.end_betting_round()
             if game.is_game_end():
                 debug("player %d wins %d chips!" % (game.get_winner(), game.total_chips))
                 game.checkout()
-                # game.print_all_player_balance()
+                game.print_all_player_balance()
                 break
             else:
                 game.deal()
@@ -58,11 +56,11 @@ def main(algorithm="mcts_vs_uniform", MCTS_iterations=100, debug_flag=0):
         winner = play_game(algorithm, MCTS_iterations)
         winner_lst.append(winner)
         lst[winner] += 1
-        print()
-        print(lst)
-
     counter = Counter(winner_lst)
-    print(counter)
+    print("Result of %s: " % algorithm)
+    print("    Player 0 wins %d times," % counter[0])
+    print("    Player 1 wins %d times," % counter[1])
+    print("----------------%d games in total" % sum(counter.values()))
 
 if __name__ == "__main__":
     if len(sys.argv) == 1:
@@ -76,12 +74,3 @@ if __name__ == "__main__":
         main(algorithm=sys.argv[1], MCTS_iterations=MCTS_iterations)
     else:
         raise Exception("invalid arguments!")
-
-    # optparser = optparse.OptionParser()
-    # optparser.add_option("--i0", dest="MCTS_iterations_player0", default=100, help="Number of iterations in MCTS")
-    # optparser.add_option("--i1", dest="MCTS_iterations_player1", default=100, help="Number of iterations in MCTS")
-    # optparser.add_option("-c", "--constant", dest="C", default=math.sqrt(2), help="constant in UCB1")
-    # optparser.add_option("-a", "--algorithm", dest="algorithm", default="mcts_vs_uniform", help="what kinds of agents")
-    # (opts, _) = optparser.parse_args()
-
-
