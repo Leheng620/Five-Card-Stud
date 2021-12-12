@@ -5,6 +5,7 @@ from collections import Counter
 from constants import debug
 import sys
 import tqdm
+import argparse
 
 from mctsAgent import MCTSAgent2, MCTSAgent
 
@@ -65,6 +66,13 @@ def main(algorithm="mcts_vs_uniform", MCTS_iterations=100, debug_flag=0):
     print(counter)
 
 if __name__ == "__main__":
+    # parser = argparse.ArgumentParser(description='Test Agents')
+    # parser.add_argument('-', type=str, default='part_seg_backbone', metavar='N',
+    #                     help='Name of the experiment')
+    # parser.add_argument('--model', type=str, default='dgcnn', metavar='N',
+    #                     choices=['pointnet', 'dgcnn'],
+    #                     help='Model to use, [pointnet, dgcnn]')
+
     if len(sys.argv) == 1:
         main()
     elif len(sys.argv) == 2 and sys.argv[1] == "random_vs_uniform":

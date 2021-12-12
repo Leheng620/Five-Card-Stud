@@ -1,4 +1,5 @@
 from constants import Actions, debug
+from card import match_card_to_num
 import random
 
 class AbstractPlayer:
@@ -22,12 +23,19 @@ class AbstractPlayer:
         state.__secret_card = state.cards[0]
         return state
 
+    def jsonify(self):
+        return {
+            "balance": self.balance,
+            "chip": self.chip,
+            "cards": [match_card_to_num(c) for c in self.cards],
+            "alive": self.alive,
+        }
+
 class RandomAgent(AbstractPlayer):
 
-    def __init__(self, balance, index, chip, alive, is_uniform=False):
+    def __init__(self, balance, index, chip, alive):
         super(RandomAgent, self).__init__(balance, index, chip, alive)
-        self.is_uniform = is_uniform
-    
+
     def deepCopy(self):
         '''
         Deepcopy the player object
@@ -50,24 +58,21 @@ class RandomAgent(AbstractPlayer):
             return Actions.CHECK, 0
 
         raise_chip = 0
-        if self.is_uniform:
-            allow_actions = game.get_allow_actions()
-            action = random.choice(allow_actions)
-        else:
-            if game.repeat:
-                allow_actions = [Actions.FOLD, Actions.CALL]
-                action = random.choices(allow_actions, [1, 2])[0]
 
-            else:
-                if self.chip == game.current_max_chips:
-                    allow_actions = [Actions.CHECK, Actions.FOLD, Actions.RAISE, Actions.ALL_IN]
-                    action = random.choices(allow_actions, [10, 0, 3, 1])[0]
-                elif game.current_max_chips == game.max_chips: # there are players have all-in
-                    allow_actions = [Actions.FOLD, Actions.CALL]
-                    action = random.choices(allow_actions, [2, 3])[0]
-                else: # there are players have raised
-                    allow_actions = [Actions.FOLD, Actions.CALL, Actions.RAISE, Actions.ALL_IN]
-                    action = random.choices(allow_actions, [1, 8, 3, 1])[0]
+        if game.repeat:
+            allow_actions = [Actions.FOLD, Actions.CALL]
+            action = random.choices(allow_actions, [1, 2])[0]
+
+        else:
+            if self.chip == game.current_max_chips:
+                allow_actions = [Actions.CHECK, Actions.FOLD, Actions.RAISE, Actions.ALL_IN]
+                action = random.choices(allow_actions, [10, 0, 3, 1])[0]
+            elif game.current_max_chips == game.max_chips: # there are players have all-in
+                allow_actions = [Actions.FOLD, Actions.CALL]
+                action = random.choices(allow_actions, [2, 3])[0]
+            else: # there are players have raised
+                allow_actions = [Actions.FOLD, Actions.CALL, Actions.RAISE, Actions.ALL_IN]
+                action = random.choices(allow_actions, [1, 8, 3, 1])[0]
 
         if action == Actions.RAISE:
             raise_chip = 10 # fix the raised amount
@@ -123,4 +128,20 @@ class RandomAgent(AbstractPlayer):
         print("Your secret card is", str(self.__secret_card))
 
     
+class UniformAgent(RandomAgent):
+    def __init__(self, balance, index, chip, alive, is_uniform=False):
+        super(RandomAgent, self).__init__(balance, index, chip, alive)
 
+    def decide_action(self, game):
+        # all alive players have all-in
+        if self.chip == game.max_chips:
+            return Actions.CHECK, 0
+
+        raise_chip = 0
+        allow_actions = game.get_allow_actions()
+        action = random.choice(allow_actions)
+
+        if action == Actions.RAISE:
+            raise_chip = 10 # fix the raised amount
+
+        return action, raise_chip

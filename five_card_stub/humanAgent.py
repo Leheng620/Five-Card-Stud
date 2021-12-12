@@ -30,6 +30,16 @@ class HumanAgent(RandomAgent):
             return (action, 0)
         
 
+class HumanGUIAgent(RandomAgent):
+    def __init__(self, balance, index, chip, alive):
+        super(RandomAgent, self).__init__(balance, index, chip, alive)
+        self.selected_action = None
+
+    def save_selected_action(self, action_tup):
+        self.selected_action = action_tup
+
+    def decide_action(self, game):
+        return self.selected_action
 
         
         

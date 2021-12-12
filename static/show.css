@@ -1,0 +1,448 @@
+body{
+    background-image: linear-gradient(to bottom, #801d1d7d, transparent);
+    background-repeat: no-repeat;
+    height: 500px;
+}
+
+button{
+    cursor: pointer;
+    border:none;
+    font-size: large;
+}
+
+.turn{
+    border:solid;
+    border-color:red;
+}
+
+.winner{
+    color: #ffd509;
+}
+
+/* nav bar */
+#nav-bar{
+    float: left;
+    width: 100%;
+}
+.nav-item{
+    display: inline-block;
+}
+
+/* container */
+#root-container{
+    height: 540px;
+    min-width: 1000px;
+}
+#main-container{
+    position: relative;
+    width: 80%;
+    height: 360px;
+    top: 20%;
+    margin: 0 auto;
+}
+#table{
+    position: relative;
+    border: solid;
+    top: 115px;
+    width: 400px;
+    height: 220px;
+    margin: 0 auto;
+}
+.player{
+    position: absolute;
+    display: inline-block;
+}
+.vertical-profile{
+    width: 65px;
+    height: 130px;
+    text-align: center;
+}
+.horizontal-profile{
+    width: 130px;
+    height: 65px;
+    text-align: center;
+}
+.player-head-picture-vertical{
+    height: 50%;
+}
+.player-name-vertical{
+    height: 25%;
+}
+.player-balance-vertical{
+    height: 25%;
+}
+.player-head-picture-horizontal{
+    width: 50%;
+    height: 100%;
+    display: inline-block;
+    position: relative;
+}
+.player-name-horizontal{
+    height: 50%;
+}
+.player-balance-horizontal{
+    height: 50%;
+}
+.player-horizontal-holder{
+    display: inline-block;
+    width: 46%;
+    height: 100%;
+    top: -15.5px;
+    position: relative;
+
+}
+.player-head-picture{
+    height: -webkit-fill-available;
+}
+#player-1{
+    top: -20px;
+    left: 77%;
+}
+#player-2{
+    top: -20px;
+    left: 5%;
+}
+#player-3{
+    left: -6%;
+    top: 156px;
+}
+#player-4{
+    top: 120px;
+    left: 94%;
+}
+#player-5{
+    top: 357px;
+    left: 20%;
+}
+#player-6{
+    top: 341px;
+    left: 85%;
+}
+
+/* card */
+.card-container{
+    position: absolute;
+    height: 96px;
+    border: solid;
+    width: 128px;
+}
+.card-holder-1{
+    position: absolute;
+    width: 72px;
+    height: 96px;
+}
+.card-holder-2{
+    position: absolute;
+    width: 72px;
+    height: 96px;
+    left: 14px;
+}
+.card-holder-3{
+    position: absolute;
+    width: 72px;
+    height: 96px;
+    left: 28px;
+}
+.card-holder-4{
+    position: absolute;
+    width: 72px;
+    height: 96px;
+    left: 42px;
+}
+.card-holder-5{
+    position: absolute;
+    width: 72px;
+    height: 96px;
+    left: 56px;
+}
+#player-1-card{
+    top: 25px;
+    left: 60%;
+}
+#player-2-card{
+    left: 25%;
+    top: 25px;
+}
+#player-3-card{
+    top: 156px;
+    left: 10%;
+}
+#player-4-card{
+    top: 130px;
+    left: 75%;
+}
+#player-5-card{
+    left: 37%;
+    top: 250px;
+}
+#player-6-card{
+    left: 67%;
+    top: 250px;
+}
+#card-pile{
+    height: 96px;
+    width: 72px;
+    left: 46%;
+    position: absolute;
+    top: 7px;
+}
+#duplicate-card-pile{
+    height: 96px;
+    width: 72px;
+    left: 46%;
+    position: absolute;
+    top: 7px;
+}
+#information-panel{
+    display: inline-block;
+    position: absolute;
+    left: 42%;
+    width: 15%;
+    text-align: center;
+    top: 113px;
+}
+
+/*button*/
+#control-button-container{
+    position: absolute;
+    top: 192px;
+    left: 37%;
+    width: 21%;
+}
+.control-button{
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+.add-player-button{
+    border: none;
+    font-size: x-large;
+    font-weight: 700;
+    border-radius: 100%;
+    height: 28px;
+    width: 28px;
+    background-color: #aeafb99c;
+    color: #3c6e5d;
+    cursor: pointer;
+}
+#begin-button{
+    position: absolute;
+    left: 47%;
+    top: 150px;
+}
+
+/* dialog */
+#add-player-dialog{
+    display: block;
+    margin: 0 auto;
+    top: 30%;
+}
+#dialog-yes-button{
+    margin-right: 10px;
+}
+#dialog-no-button{
+    margin-right: 10px;
+}
+#final-result-dialog{
+    display: block;
+    position: absolute;
+    width: 515px;
+    height: 400px;
+    border: solid;
+    padding: inherit;
+}
+#final-result-title{
+    text-align: center;
+}
+#final-result-container{
+    width: 100%;
+    height: 312px;
+    display: grid;
+    grid-template-rows: 103px 103px;
+    grid-template-columns: 257px 257px;
+}
+.final-result-panel{
+    padding: 4px;
+}
+.final-result-player-information{
+    width: 90px;
+    height: 96px;
+    float: left;
+}
+.final-result-player-pic{
+    width: 56px;
+    height: 56px;
+    margin: 0 auto;
+}
+.final-result-player-name{
+    position: relative;
+    top: 4px;
+    text-align: center;
+}
+.final-result-card-type{
+    width: 156px;
+    height: 96px;
+    display: inline-block;
+    position: absolute;
+    opacity: 50%;
+}
+.final-result-card-holder{
+    float: left;
+    display: inline-block;
+    position: absolute;
+}
+.final-result-card-holder-1{
+    height: 96px;
+    width: 72px;
+}
+.final-result-card-holder-2{
+    height: 96px;
+    width: 72px;
+    left: 14px;
+}
+.final-result-card-holder-3{
+    height: 96px;
+    width: 72px;
+    left: 28px;
+}
+.final-result-card-holder-4{
+    height: 96px;
+    width: 72px;
+    left: 42px;
+}
+.final-result-card-holder-5{
+    height: 96px;
+    width: 72px;
+    left: 56px;
+}
+.final-result-card-type-result{
+    display: inline-block;
+    position: absolute;
+    font-size: 35px;
+    width: 128px;
+    text-align: center;
+    font-weight: bolder;
+    margin-top: 30px;
+}
+#final-result-dialog-button-container{
+    text-align: center;
+}
+#final-result-dialog-close-button{
+
+}
+
+/*input*/
+#add-chip-input{
+    width: 40%;
+}
+
+/*animation*/
+
+@keyframes distribute-card-animation-1{
+    from{
+        left: 46%;
+        top: 7px;
+    }
+    to {
+        left: 63%;
+        top: 25px;
+    }
+}
+
+@keyframes distribute-card-animation-2{
+    from{
+        left: 46%;
+        top: 7px;
+    }
+    to {
+        left: 28%;
+        top: 25px;
+    }
+}
+
+@keyframes distribute-card-animation-3{
+    from{
+        left: 46%;
+        top: 7px;
+    }
+    to {
+        left: 13%;
+        top: 156px;
+    }
+}
+
+@keyframes distribute-card-animation-5{
+    from{
+        left: 46%;
+        top: 7px;
+    }
+    to {
+        left: 40%;
+        top: 250px;
+    }
+}
+
+@keyframes distribute-card-animation-6{
+    from{
+        left: 46%;
+        top: 7px;
+    }
+    to {
+        left: 70%;
+        top: 250px;
+    }
+}
+
+.distribute-card-1{
+    animation-name: distribute-card-animation-1;
+    animation-duration: 0.3s;
+    animation-timing-function: cubic-bezier(.39,.58,.57,1);
+    animation-delay: 0s;
+    animation-iteration-count: 1;
+    animation-direction: normal;
+    animation-fill-mode: none;
+    animation-play-state: running;
+}
+
+.distribute-card-2{
+    animation-name: distribute-card-animation-2;
+    animation-duration: 0.3s;
+    animation-timing-function: cubic-bezier(.39,.58,.57,1);
+    animation-delay: 0s;
+    animation-iteration-count: 1;
+    animation-direction: normal;
+    animation-fill-mode: none;
+    animation-play-state: running;
+}
+
+.distribute-card-3{
+    animation-name: distribute-card-animation-3;
+    animation-duration: 0.3s;
+    animation-timing-function: cubic-bezier(.39,.58,.57,1);
+    animation-delay: 0s;
+    animation-iteration-count: 1;
+    animation-direction: normal;
+    animation-fill-mode: none;
+    animation-play-state: running;
+}
+
+.distribute-card-5{
+    animation-name: distribute-card-animation-5;
+    animation-duration: 0.3s;
+    animation-timing-function: cubic-bezier(.39,.58,.57,1);
+    animation-delay: 0s;
+    animation-iteration-count: 1;
+    animation-direction: normal;
+    animation-fill-mode: none;
+    animation-play-state: running;
+}
+
+.distribute-card-6{
+    animation-name: distribute-card-animation-6;
+    animation-duration: 0.3s;
+    animation-timing-function: cubic-bezier(.39,.58,.57,1);
+    animation-delay: 0s;
+    animation-iteration-count: 1;
+    animation-direction: normal;
+    animation-fill-mode: none;
+    animation-play-state: running;
+}

@@ -1,8 +1,9 @@
-from agent import RandomAgent
+from agent import RandomAgent, UniformAgent
 from card import *
 import random
 from collections import deque
 from mctsAgent import MCTSAgent
+from humanAgent import HumanAgent
 
 class GameState:
     def __init__(self, n_players=2, balance=100, ante=5, prevState=None):
@@ -81,33 +82,43 @@ class GameState:
         state.player_queue = deque(self.player_queue)
         return state
 
-    def initializePlayers(self, algorithm="mcts_vs_uniform", MCTS_iterations=None) -> None:
+    def initializePlayers(self, algorithm) -> None:
         '''
         Deal two cards to each player, and initialize the players array.
 
         Args:
-            algorithm:
-                Algorithm to use for each player
-            MCTS_iterations:
-                integer or List[integer]. 
+            algorithm: (algorithm, MCTS_iterations):
+                Algorithm to use for each player,
+
+                List[tuple(integer, integer)].
                 When algorithm is "mcts_vs_random" or "mcts_vs_uniform", MCTS_iterations should be an integer
                 When algorithm is "mcts_vs_mcts", MCTS_iterations should be a list of integer of length 2
         '''
-        if algorithm == "random_vs_uniform":
-            self.players = [RandomAgent(self.balance, 0, 0, True), RandomAgent(self.balance, 1, 0, True, is_uniform=True)]
-        elif algorithm == "mcts_vs_random":
-            self.players = [MCTSAgent(self.balance, 0, 0, True, MCTS_iterations), RandomAgent(self.balance, 1, 0, True)]
-        elif algorithm == "mcts_vs_uniform":
-            self.players = [MCTSAgent(self.balance, 0, 0, True, MCTS_iterations), RandomAgent(self.balance, 1, 0, True, is_uniform=True)]
-        elif algorithm == "mcts_vs_mcts":
-            if MCTS_iterations is None:
-                self.players = [MCTSAgent(self.balance, i, 0, True) for i in range(self.n_players)]
-            else:  
-                if type(MCTS_iterations) is not list or len(MCTS_iterations) < 2:
-                    raise Exception("mcts_vs_mcts only accepts list of length 2")
-                self.players = [MCTSAgent(self.balance, i, 0, True, n_iterations=MCTS_iterations[i]) for i in range(2)]
-        else:
-            self.players = [RandomAgent(self.balance, i, 0, True) for i in range(self.n_players)]
+        ALGORITHM = [MCTSAgent, UniformAgent, RandomAgent, HumanAgent]
+        self.players = []
+        for n in range(self.n_players):
+            algor = algorithm[n][0]
+            iteration = algorithm[n][1]
+            if algor == 1:
+                self.players.append(ALGORITHM[algor-1](self.balance, n, 0, True, iteration))
+            else:
+                self.players.append(ALGORITHM[algor-1](self.balance, n, 0, True))
+
+        # if algorithm == "random_vs_uniform":
+        #     self.players = [RandomAgent(self.balance, 0, 0, True), RandomAgent(self.balance, 1, 0, True)]
+        # elif algorithm == "mcts_vs_random":
+        #     self.players = [MCTSAgent(self.balance, 0, 0, True, MCTS_iterations), RandomAgent(self.balance, 1, 0, True)]
+        # elif algorithm == "mcts_vs_uniform":
+        #     self.players = [MCTSAgent(self.balance, 0, 0, True, MCTS_iterations), RandomAgent(self.balance, 1, 0, True)]
+        # elif algorithm == "mcts_vs_mcts":
+        #     if MCTS_iterations is None:
+        #         self.players = [MCTSAgent(self.balance, i, 0, True) for i in range(self.n_players)]
+        #     else:
+        #         if type(MCTS_iterations) is not list or len(MCTS_iterations) < 2:
+        #             raise Exception("mcts_vs_mcts only accepts list of length 2")
+        #         self.players = [MCTSAgent(self.balance, i, 0, True, n_iterations=MCTS_iterations[i]) for i in range(2)]
+        # else:
+        #     self.players = [RandomAgent(self.balance, i, 0, True) for i in range(self.n_players)]
 
     def initialize_game_state(self):
         # Reset game state

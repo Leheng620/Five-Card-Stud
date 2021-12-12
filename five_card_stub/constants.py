@@ -192,3 +192,5 @@ def debug(*msg, sep=' ', end='\n'):
 TWENTY_EIGHT_CHOOSE_FIVE = 98280 # 28 CHOOSE 5
 CHANCE_NODE = 'chance_node' # directory name
 A = 1
+
+# ----------------------------- GUI ------------------------------
