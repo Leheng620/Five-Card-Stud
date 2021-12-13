@@ -23,29 +23,18 @@ def load_init_game_state():
     # there is only one human player
     game_state_before_game_start = {
         "players": [0, 0, 0, 0, {
-            "pic": "./static/pic/dp.jpg",
+            "pic": "./static/pic/human.jpg",
             "balance": 100,
             "name": "hi",
             "agent": 4,
-            "iteration": 0
+            "iteration": 0,
+            "alive": True
         }, 0],
         "maxChip": 100
     }
     # cannot use str() blc front end will not receive response
     return game_state_before_game_start
 
-def load_player():
-    game_state_before_game_start = {
-        "players": [0, 0, 0, 0, 0, 0],
-        "firstPlayer": 0,
-        "maxChip": 0,
-        "totalChip": 0,
-        "currentMaxChip": 0,
-        "repeat": False,
-        "endType": 0
-    }
-    # cannot use str() blc front end will not receive response
-    return game_state_before_game_start
 
 def update_game(g, gs):
     global game, game_state
@@ -70,12 +59,11 @@ def fcs_msg():
         update_game(return_val, None)
         return_val = get_dict_str(return_val)
     elif data['command'] == 'load-player':
-        # return_val = sh.clear(game)
-        # update_game(return_val)
-        # return_val = get_dict_str(return_val)
-        pass
+        return_game, return_game_state = clear(game, game_state)
+        update_game(return_game, return_game_state)
+        return_val = get_dict_str(return_game)
     else:
-        return_game, return_game_state = command_control[data['command']](game, *data['args'])
+        return_game, return_game_state = command_control[data['command']](game, game_state, *data['args'])
         update_game(return_game, return_game_state)
         return_val = get_dict_str(return_game)
     print(game)

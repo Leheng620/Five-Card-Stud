@@ -194,3 +194,14 @@ CHANCE_NODE = 'chance_node' # directory name
 A = 1
 
 # ----------------------------- GUI ------------------------------
+card_type_map_cn = {
+    NOPAIR: 'No Pair',
+    ONEPAIR: 'One Pair',
+    TWOPAIR: 'Two Pair',
+    TRIPLE: 'Triple',
+    STRAIGHT: 'Straight',
+    FLUSH: 'Flush',
+    FULLHOUSE: 'Full House',
+    QUADRUPLE: 'Quadruple',
+    STRAIGHTFLUSH: 'Straight Flush'
+}

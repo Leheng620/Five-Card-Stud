@@ -16,7 +16,8 @@ button{
 }
 
 .winner{
-    color: #ffd509;
+    /*color: #ffd509;*/
+    color: #a71700;
 }
 
 /* nav bar */
@@ -317,7 +318,7 @@ button{
 .final-result-card-type-result{
     display: inline-block;
     position: absolute;
-    font-size: 35px;
+    font-size: 26px;
     width: 128px;
     text-align: center;
     font-weight: bolder;

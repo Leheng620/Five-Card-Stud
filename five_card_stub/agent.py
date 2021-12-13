@@ -27,7 +27,7 @@ class AbstractPlayer:
         return {
             "balance": self.balance,
             "chip": self.chip,
-            "cards": [match_card_to_num(c) for c in self.cards],
+            "cards": [match_card_to_num(c) for c in self.cards] if self.cards is not None else 0,
             "alive": self.alive,
         }
 
@@ -108,7 +108,7 @@ class RandomAgent(AbstractPlayer):
             self.balance -= chip_diff
             self.chip += chip_diff
 
-        game.player_act(self.index, action, raise_chip, chip_diff)
+        game.player_act(game.players.index(self), action, raise_chip, chip_diff)
         # print("[ACT] player:", self.index, "action:", action, "chip:", self.chip, "balance:", self.balance)
 
     def append_card(self, card):

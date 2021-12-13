@@ -22,8 +22,8 @@ function init() {
 function loadPlayer() {
     send_message(FCSMSG.LOADPLAYER, [], function (result) {
         console.log(result)
-        player = result
-        players = player.showhand.players
+        player = result.game
+        players = player.players
         setup(players)
     })
 }
@@ -34,7 +34,10 @@ function setup(players) {
     addPlayer(players)
     addPlayerButton(players)
     setupAddPlayerEventHandler()
+
     setupRemoveHumanPlayerHandler()
+    setupResetGamePlayerHandler()
+
     // addCard(players)
     addCardPile()
     addInformationPanel(false, player)
@@ -46,22 +49,23 @@ function firstStart(newPlayer) {
     removeAllChildren(con)
     payEnterTicket(newPlayer)
     addPlayer(players)
-    addCard(newPlayer.showhand.players)
+    addCard(newPlayer.players)
     addCardPile()
     addInformationPanel(true, newPlayer)
-    let newPlayers = newPlayer.showhand.players
+    let newPlayers = newPlayer.players
     let alivePlayer = getAlivePlayer(false, newPlayer)
+    console.log(alivePlayer)
     let j = 0
     let interval2 = setInterval(function () {
         if(j > 0)
             restoreHighlightPlayer(newPlayers[alivePlayer[j-1]], alivePlayer[j-1])
         highlightPlayer(newPlayers[alivePlayer[j]], alivePlayer[j])
-        updateInformationPanel(newPlayers[alivePlayer[j]], players[alivePlayer[j]])
+        updateInformationPanel(newPlayer)
         updatePlayerInformation(newPlayers[alivePlayer[j]], alivePlayer[j])
         updatePlayerDecision(newPlayers[alivePlayer[j]], alivePlayer[j])
         if(alivePlayer[j] === 4){
             player = newPlayer
-            players = player.showhand.players
+            players = player.players
             addButton()
             clearInterval(interval2)
         }
@@ -73,7 +77,7 @@ function firstStart(newPlayer) {
 function payEnterTicket(newPlayer){
     for(let i = 0; i < players.length; i++){
         if(players[i] !== 0){
-            players[i].chip = newPlayer.showhand.players[4].chip
+            players[i].chip = newPlayer.players[4].chip
         }
     }
 }
@@ -90,11 +94,12 @@ function gameInProgress(beforePlayer, newPlayer, callback, afterPlayer) {
 }
 
 function simulateBotMove(beforePlayer, newPlayer, callback, afterPlayer) {
-    let newPlayers = newPlayer.showhand.players
+    let newPlayers = newPlayer.players
     let alivePlayer = getAlivePlayer(afterPlayer, newPlayer)
     if(alivePlayer.length === 0){
+        console.log("why")
         player = newPlayer
-        players = player.showhand.players
+        players = player.players
         if(callback)
             callback()
     }
@@ -115,12 +120,12 @@ function simulateBotMove(beforePlayer, newPlayer, callback, afterPlayer) {
                 if(j > 0)
                     restoreHighlightPlayer(newPlayers[alivePlayer[j-1]], alivePlayer[j-1])
                 highlightPlayer(newPlayers[alivePlayer[j]], alivePlayer[j])
-                updateInformationPanel(newPlayers[alivePlayer[j]], players[alivePlayer[j]])
+                updateInformationPanel(newPlayer)
                 updatePlayerInformation(newPlayers[alivePlayer[j]], alivePlayer[j])
                 updatePlayerDecision(newPlayers[alivePlayer[j]], alivePlayer[j])
                 if(beforePlayer && alivePlayer[j] === 4){
                     player = newPlayer
-                    players = player.showhand.players
+                    players = player.players
                     addButton()
                     clearInterval(interval2)
                     if(callback)
@@ -134,7 +139,7 @@ function simulateBotMove(beforePlayer, newPlayer, callback, afterPlayer) {
                 if(j === alivePlayer.length + 1){
                     restoreHighlightPlayer(newPlayers[alivePlayer[alivePlayer.length - 1]], alivePlayer[alivePlayer.length - 1])
                     player = newPlayer
-                    players = player.showhand.players
+                    players = player.players
                     clearInterval(interval2)
                     if(callback)
                         callback()
@@ -150,7 +155,7 @@ function simulateBotMove(beforePlayer, newPlayer, callback, afterPlayer) {
 
 function getAlivePlayer(afterPlayer, player) {
     let alivePlayer = []
-    let index = Number(player.showhand.firstPlayer)
+    let index = Number(player.firstPlayer)
     if(afterPlayer)
         index = 4
     for(let i = 0; i < players.length; i++){
@@ -158,7 +163,7 @@ function getAlivePlayer(afterPlayer, player) {
             alivePlayer.push(index)
         }
         index = index === players.length-1 ? 0 : index + 1
-        if(afterPlayer && index === Number(player.showhand.firstPlayer)) break
+        if(afterPlayer && index === Number(player.firstPlayer)) break
     }
     if(afterPlayer && alivePlayer[0] === 4){
         alivePlayer.reverse().pop()
@@ -183,13 +188,11 @@ function addCardDynamically(newPlayer, index) {
     }
 }
 
-function updateInformationPanel(newPlayer, oldPlayer) {
+function updateInformationPanel(game) {
     let current = document.getElementById(FCSCLASS.CURRENTCHIPBOX)
     let total = document.getElementById((FCSCLASS.TOTALCHIPBOX))
-    if(Number(current.innerHTML) < newPlayer.chip){
-        current.innerHTML = "" +newPlayer.chip
-    }
-    total.innerHTML = ""+ (Number(total.innerHTML) + (newPlayer.chip - oldPlayer.chip))
+    current.innerHTML = "" + game.currentMaxChip
+    total.innerHTML = ""+ game.totalChip
 }
 
 function updatePlayerInformation(newPlayer, index) {
@@ -213,6 +216,7 @@ function updatePlayerDecision(newPlayer, index) {
 
 function highlightPlayer(newPlayer, index) {
     let p = document.getElementById(FCSCLASS.PLAYER + "-" + (index+1))
+    console.log(index)
     p.classList.add(FCSCLASS.TURN)
 }
 
@@ -255,8 +259,8 @@ function determineGameStatus() {
 function getWinner() {
     send_message(FCSMSG.GETWINNER, [], function (result) {
         console.log(result)
-        player = result
-        players = result.showhand.players
+        player = result.game
+        players = result.game.players
         let chip = checkPlayerChip()
         if(chip.length === 1){
             loadPlayer()
@@ -270,17 +274,17 @@ function repeatRound() {
     send_message(FCSMSG.REPEATROUND, [], function (result) {
         console.log(result)
         // player = result
-        // players = player.showhand.players
+        // players = player.players
         let chip = checkPlayerChip()
         if(chip.length === 1){
             getWinner()
         }else{
             if(players[4].alive && Math.max(...chip) === players[4].chip){
-                gameInProgress(false, result, nextRound)
+                gameInProgress(false, result.game, nextRound)
             }else if(players[4].alive){
-                gameInProgress(true, result)
+                gameInProgress(true, result.game)
             }else{ // human player gives up
-                gameInProgress(false, result, nextRound)
+                gameInProgress(false, result.game, nextRound)
             }
         }
     })
@@ -299,15 +303,15 @@ function nextRound() {
         send_message(FCSMSG.NEXTROUND, [], function (result) {
             console.log(result)
             // player = result
-            // players = result.showhand.players
+            // players = result.players
             let chip = checkPlayerChip()
             if(chip.length === 1){
                 getWinner()
             }else{
                 if(players[4].alive){
-                    gameInProgress(true, result)
+                    gameInProgress(true, result.game)
                 }else{ // human player gives up
-                    gameInProgress(false, result, determineGameStatus)
+                    gameInProgress(false, result.game, determineGameStatus)
                 }
             }
         })
@@ -495,7 +499,7 @@ function buildControlButton() {
     let con = document.createElement(HTMLTAG.DIV)
     con.setAttribute(ATTRI.ID, FCSCLASS.CONTROLBUTTONCONTAINER)
 
-    let repeat = player.showhand.repeat
+    let repeat = player.repeat
     let balance = []
     let chip = []
     for(let i = 0; i < players.length; i++){
@@ -504,8 +508,8 @@ function buildControlButton() {
             chip.push(players[i].chip)
         }
     }
-    let chipCap = Number(player.showhand.chipCap)
-    let highestCap = Math.max(...chip)
+    let chipCap = Number(player.maxChip)
+    let highestCap = player.currentMaxChip
 
     let tempa = ['弃牌', '过牌', '跟注', '加注']
     let bu = document.createElement(HTMLTAG.BUTTON)
@@ -537,12 +541,12 @@ function buildControlButton() {
     input.setAttribute(ATTRI.ID, FCSCLASS.ADDCHIPINPUT)
     input.setAttribute(ATTRI.TYPE, 'number')
 
-    if(chipCap - highestCap >= 0 && !repeat){
+    if(chipCap - highestCap >= 5 && !repeat){
         input.setAttribute(ATTRI.MAX, ''+ (chipCap - highestCap))
-        input.setAttribute(ATTRI.MIN, '10')
-        let placeholder = '10-' + (chipCap - highestCap)
+        input.setAttribute(ATTRI.MIN, '5')
+        let placeholder = '5-' + (chipCap - highestCap)
         input.setAttribute(ATTRI.PLACEHOLDER, placeholder)
-        setupCallback(bu, EVENT.ONCLICK, FCSCALLBACK.HANDLEPLAYEROPTION, [FCSMSG.PLAYERADD, 1, 10, chipCap - highestCap] )
+        setupCallback(bu, EVENT.ONCLICK, FCSCALLBACK.HANDLEPLAYEROPTION, [FCSMSG.PLAYERADD, 1, 5, chipCap - highestCap] )
         con.appendChild(bu)
         con.appendChild(input)
     }
@@ -589,15 +593,9 @@ function buildInformationPanel(begin, game) {
     if(begin){
         let totalL = document.createElement(HTMLTAG.LABEL)
         let totalS = document.createElement(HTMLTAG.SPAN)
-        let chip = 0
-        for(let i = 0; i < players.length; i++){
-            if(players[i] !== 0){
-                chip += game.players[4].chip
-            }
-        }
         totalL.innerHTML = "total:"
         totalS.setAttribute(ATTRI.ID, FCSCLASS.TOTALCHIPBOX)
-        totalS.innerHTML = "" + chip
+        totalS.innerHTML = "" + game.totalChip
         let currentL = document.createElement(HTMLTAG.LABEL)
         let currentS = document.createElement(HTMLTAG.SPAN)
         currentL.innerHTML = "current:"
@@ -755,7 +753,7 @@ function showFinalResultDialog(players) {
             let cardTypeResult = document.createElement(HTMLTAG.DIV)
             cardTypeResult.setAttribute(ATTRI.CLASS, FCSCLASS.FINALRESULTCARDTYPERESULT)
             cardTypeResult.innerHTML = players[i].endType
-            if(i !== players.length && player.showhand.firstPlayer === i){
+            if(i !== players.length && player.firstPlayer === i){
                 cardTypeResult.classList.add("winner")
                 panel.classList.add("turn")
             }
@@ -835,6 +833,11 @@ function setupRemoveHumanPlayerHandler() {
     setupCallback(d, EVENT.ONCLICK, FCSCALLBACK.HANDLEDELETEHUMANPLAYER, []) // delete human player
 }
 
+function setupResetGamePlayerHandler() {
+    let d = document.getElementById('reset-game');
+    setupCallback(d, EVENT.ONCLICK, FCSCALLBACK.HANDLERESETGAME, []) // delete human player
+}
+
 
 function removeAddPlayerEventHandler() {
     for(let i = 1; i <= 6; i++){
@@ -894,13 +897,24 @@ function handleDeleteHumanPlayer() {
             setup(players)
         })
     }
+}
 
+function handleResetGame() {
+    init()
 }
 
 function handleBegin() {
     send_message(FCSMSG.BEGIN, [], function (result) {
         console.log(result)
-        firstStart(result)
+        player = result.game
+        players = player.players
+        if(!result.game.terminal){
+            if(removeHumanPlayer){
+                gameInProgress(false, result.game, determineGameStatus, true)
+            }else{
+                firstStart(result.game)
+            }
+        }
     })
 }
 
@@ -919,12 +933,12 @@ function handlePlayerOption(callbackName, arg, min, max) {
     removeButton()
     send_message(FCSMSG.PROCESSPLAYEROPTION, [callbackName, amount], function (result) {
         console.log(result)
-        let newPlayers = result.showhand.players
-        updateInformationPanel(newPlayers[4], players[4])
+        let newPlayers = result.game.players
+        updateInformationPanel(result.game)
         updatePlayerInformation(newPlayers[4], 4)
         updatePlayerDecision(newPlayers[4], 4)
         restoreHighlightPlayer(newPlayers[4], 4)
-        gameInProgress(false, result, determineGameStatus, true)
+        gameInProgress(false, result.game, determineGameStatus, true)
     })
 }
 

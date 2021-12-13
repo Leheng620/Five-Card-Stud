@@ -106,6 +106,7 @@ const FCSCALLBACK = {
     HANDLEDELETEPLAYER: 'handleDeletePlayer',
     HANDLEDELETEHUMANPLAYER: 'handleDeleteHumanPlayer',
     HANDLEPLAYEROPTION: 'handlePlayerOption',
+    HANDLERESETGAME: 'handleResetGame'
 }
 
 const FCSAGENTTYPE = ["MCTS Agent", "Uniform Agent", "Random Agent"]

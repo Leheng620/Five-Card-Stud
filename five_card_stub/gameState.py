@@ -3,7 +3,7 @@ from card import *
 import random
 from collections import deque
 from mctsAgent import MCTSAgent
-from humanAgent import HumanAgent
+from humanAgent import HumanGUIAgent
 
 class GameState:
     def __init__(self, n_players=2, balance=100, ante=5, prevState=None):
@@ -49,6 +49,7 @@ class GameState:
             self.repeat = prevState.repeat
             self.num_alive_players_not_been_processed = prevState.num_alive_players_not_been_processed
             self.first_player = prevState.first_player
+            self.table_index = prevState.table_index
 
         else:
             self.round = 1
@@ -68,6 +69,7 @@ class GameState:
             self.repeat = False
             self.num_alive_players_not_been_processed = 0
             self.first_player = None
+            self.table_index = -1
 
     def deepCopy(self):
         '''
@@ -94,7 +96,7 @@ class GameState:
                 When algorithm is "mcts_vs_random" or "mcts_vs_uniform", MCTS_iterations should be an integer
                 When algorithm is "mcts_vs_mcts", MCTS_iterations should be a list of integer of length 2
         '''
-        ALGORITHM = [MCTSAgent, UniformAgent, RandomAgent, HumanAgent]
+        ALGORITHM = [MCTSAgent, UniformAgent, RandomAgent, HumanGUIAgent]
         self.players = []
         for n in range(self.n_players):
             algor = algorithm[n][0]
@@ -237,7 +239,8 @@ class GameState:
         '''
         alive_p = self.get_alive_players()
         alive_p.sort(key=cmp_func_map[self.round])
-        self.first_player = alive_p[-1].index
+        self.first_player = self.players.index(alive_p[-1])
+        self.table_index = alive_p[-1].index
         self.player_queue.extend(self.alive_indices[self.first_player:] + self.alive_indices[:self.first_player])
     
     def clear_player_queue(self):
@@ -323,9 +326,9 @@ class GameState:
     def get_winner(self):
         alive_p = self.get_alive_players()
         if len(alive_p) == 1:
-            return alive_p[0].index
+            return self.players.index(alive_p[0])
         alive_p.sort(key=cmp_func_map[5])
-        return alive_p[-1].index
+        return self.players.index(alive_p[-1])
     
     def is_terminal(self):
         for p in self.players:
