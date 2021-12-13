@@ -1,20 +1,19 @@
 #########################################################
-# Test the performance & efficiency of MCTS agents with 
-# different itration numbers. We define:
+# Test the performance & efficiency of MCTS2 agents with 
+# different value for parameter C in UCB1 function. 
+# We define:
 # - Performance: the probability of win by playing with
 #   uniform agent
 # - Efficiency: the mean decision time each agent spent
 #   throughout the whole game with uniform agent
 #########################################################
-from random import Random
-from .gameState import GameState
-from .agent import *
-from .card import *
-from .constants import debug
+from gameState import GameState
+from agent import *
+from card import *
+from constants import debug
 import time
 import matplotlib.pyplot as plt
 import seaborn as sns
-from math import sqrt
 from mctsAgent import MCTSAgent2
 import numpy as np
 import tqdm
@@ -32,17 +31,16 @@ def play_game(C, time_record):
     game = GameState(balance=100)
     # Initialize players based on algorithm
     game.players = [MCTSAgent2(game.balance, 0, 0, True, n_iterations=100, C=C), 
-                    RandomAgent(game.balance, 1, 0, True, False)]
+                    RandomAgent(game.balance, 1, 0, True)]
 
     game_count = 0
     while True:
         game_count += 1
-        # print("*************************************************")
-        # print("Game %d starts..." % game_count)
+        debug("Game %d starts..." % game_count)
         game.initialize_game_state()
 
         while True:
-            # game.print_cards()
+            game.print_cards()
             game.start_betting_round()
 
             while True:
@@ -62,7 +60,7 @@ def play_game(C, time_record):
             if game.is_game_end():
                 debug("player %d wins %d chips!" % (game.get_winner(), game.total_chips))
                 game.checkout()
-                # game.print_all_player_balance()
+                game.print_all_player_balance()
                 break
             else:
                 game.deal()
@@ -73,15 +71,15 @@ def play_game(C, time_record):
 
 def main(debug=0):
     Debug.debug = debug
-    C_range = np.arange(1, 10)
+    C_range = np.arange(10, 101, 10)
     n_runs = 1000
-    win_times = np.zeros(len(C_range)) # win times of MCTS Agent
-    mean_time_record = np.zeros(len(C_range)) # win times of MCTS Agent
-    for i in tqdm.tqdm(range(len(C_range))):
+    win_times = np.zeros(len(C_range))        # win times of MCTS2 Agent
+    mean_time_record = np.zeros(len(C_range)) 
+    for i in range(len(C_range)):
         # Time record for MCTS agent
         print("Test C=", C_range[i])
         time_record = []
-        for _ in range(n_runs):
+        for _ in tqdm.tqdm(range(n_runs)):
             winner = play_game(C=C_range[i], time_record=time_record)
             if winner == 0:
                 win_times[i] += 1

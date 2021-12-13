@@ -6,8 +6,6 @@ from constants import debug
 import sys
 import tqdm
 
-from mctsAgent import MCTSAgent2, MCTSAgent
-
 
 def play_game(algorithm, MCTS_iterations=None):
     '''
@@ -58,11 +56,12 @@ def main(algorithm="mcts_vs_uniform", MCTS_iterations=100, debug_flag=0, num_gam
         winner = play_game(algorithm, MCTS_iterations)
         winner_lst.append(winner)
         lst[winner] += 1
-        print()
-        print(lst)
-
     counter = Counter(winner_lst)
     print(counter)
+    print("Result of %s: " % algorithm)
+    print("    Player 0 wins %d times," % counter[0])
+    print("    Player 1 wins %d times," % counter[1])
+    print("----------------%d games in total" % sum(counter.values()))
 
 if __name__ == "__main__":
     if len(sys.argv) == 2:
@@ -76,12 +75,3 @@ if __name__ == "__main__":
         main(algorithm=sys.argv[1], MCTS_iterations=MCTS_iterations, debug_flag=1, num_game_play=int(sys.argv[4]))
     else:
         raise Exception("invalid arguments!")
-
-    # optparser = optparse.OptionParser()
-    # optparser.add_option("--i0", dest="MCTS_iterations_player0", default=100, help="Number of iterations in MCTS")
-    # optparser.add_option("--i1", dest="MCTS_iterations_player1", default=100, help="Number of iterations in MCTS")
-    # optparser.add_option("-c", "--constant", dest="C", default=math.sqrt(2), help="constant in UCB1")
-    # optparser.add_option("-a", "--algorithm", dest="algorithm", default="mcts_vs_uniform", help="what kinds of agents")
-    # (opts, _) = optparser.parse_args()
-
-

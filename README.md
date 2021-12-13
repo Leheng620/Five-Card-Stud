@@ -43,9 +43,7 @@
     After the simulation ends, a counter object will be printed out. The player 0 is the player before "vs" in `<option>`, player 1 is the player after "vs" in `<option>`
 
 #### Play games with a MCTS agent (Our best agent so far) in command line. You can also try the online demo
-`python five_card_stud/test_human.py <iteration>`
-
-`<itegration>` is optional, the default is 100, which is the number of iterations the MCTS agents will run.
+`python five_card_stud/test_human.py`
 
 #### Run tests
 `test_efficiency.py` contains the script to test algorithm running time, the argument is the same as `game.py` except that we fix the number of game plays to be 100.
