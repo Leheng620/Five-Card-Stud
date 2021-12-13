@@ -26,7 +26,7 @@ def load_init_game_state():
         "players": [0, 0, 0, 0, {
             "pic": "./static/pic/human.jpg",
             "balance": 100,
-            "name": "hi",
+            "name": "Human",
             "agent": 4,
             "iteration": 0,
             "alive": True

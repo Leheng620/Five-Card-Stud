@@ -705,7 +705,7 @@ function showFinalResultDialog(players) {
     let d = document.createElement(HTMLTAG.DIALOG)
     d.setAttribute(ATTRI.ID, FCSCLASS.FINALRESULTDIALOG)
     let title = document.createElement(HTMLTAG.H3)
-    title.innerHTML = "hi"
+    title.innerHTML = "Final Result"
     title.setAttribute(ATTRI.ID, FCSCLASS.FINALRESULTTITLE)
 
     let resultContainer = document.createElement(HTMLTAG.DIV)
