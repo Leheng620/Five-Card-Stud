@@ -488,6 +488,9 @@ function buildCard(player, players) {
         if(i <= players[player-1].cards.length){
             let cardImg = document.createElement(HTMLTAG.IMG)
             cardImg.setAttribute(ATTRI.SRC, "./static/card/" + players[player-1].cards[i-1] + ".png")
+            if(player !== 5 && i === 1){
+                cardImg.setAttribute(ATTRI.SRC, "./static/card/" + 100 + ".png")
+            }
             card.appendChild(cardImg)
         }
         con.appendChild(card)
