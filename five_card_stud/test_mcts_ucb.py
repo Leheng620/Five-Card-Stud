@@ -7,10 +7,10 @@
 #   throughout the whole game with uniform agent
 #########################################################
 from random import Random
-from gameState import GameState
-from agent import *
-from card import *
-from constants import debug
+from .gameState import GameState
+from .agent import *
+from .card import *
+from .constants import debug
 import time
 import matplotlib.pyplot as plt
 import seaborn as sns

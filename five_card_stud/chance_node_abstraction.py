@@ -1,4 +1,4 @@
-import card
+from five_card_stud import card
 from constants import debug, Debug, TWENTY_EIGHT_CHOOSE_FIVE, CHANCE_NODE
 from collections import Counter
 import pickle
