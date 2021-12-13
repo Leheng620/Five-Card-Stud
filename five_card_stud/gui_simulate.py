@@ -1,7 +1,7 @@
-from constants import *
-from card import *
+from .constants import *
+from .card import *
 import random
-from gameState import GameState
+from .gameState import GameState
 
 def clear(game, game_state):
     game_state.checkout()

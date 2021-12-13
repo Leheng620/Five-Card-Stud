@@ -1,6 +1,6 @@
 from math import sqrt, log
 import random
-from constants import INF
+from .constants import INF
 
 class Node:
     __slots__ = [

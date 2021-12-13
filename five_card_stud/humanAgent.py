@@ -3,8 +3,8 @@
 # Define a human agent what takes command line input
 #
 ####################################################
-from agent import RandomAgent
-from constants import Actions
+from .agent import RandomAgent
+from .constants import Actions
 
 
 class HumanAgent(RandomAgent):

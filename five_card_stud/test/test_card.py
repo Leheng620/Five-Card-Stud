@@ -1,8 +1,8 @@
 from unittest import TestCase
 import random
 
-from card import Card
-from constants import *
+from ..card import Card
+from ..constants import *
 
 
 

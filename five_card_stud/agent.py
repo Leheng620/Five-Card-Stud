@@ -1,5 +1,5 @@
-from constants import Actions, debug
-from card import match_card_to_num
+from .constants import Actions, debug
+from .card import match_card_to_num
 import random
 
 class AbstractPlayer:

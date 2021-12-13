@@ -1,9 +1,9 @@
-from agent import RandomAgent, UniformAgent
-from card import *
+from .agent import RandomAgent, UniformAgent
+from .card import *
 import random
 from collections import deque
-from mctsAgent import MCTSAgent
-from humanAgent import HumanGUIAgent
+from .mctsAgent import MCTSAgent
+from .humanAgent import HumanGUIAgent
 
 class GameState:
     def __init__(self, n_players=2, balance=100, ante=5, prevState=None):

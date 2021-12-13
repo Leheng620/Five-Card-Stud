@@ -1,13 +1,13 @@
-from gameState import GameState
-from agent import *
-from card import *
+from .gameState import GameState
+from .agent import *
+from .card import *
 from collections import Counter
-from constants import debug
+from .constants import debug
 import sys
 import tqdm
 import argparse
 
-from mctsAgent import MCTSAgent2, MCTSAgent
+from .mctsAgent import MCTSAgent2, MCTSAgent
 
 
 def play_game(algorithm, MCTS_iterations=None):

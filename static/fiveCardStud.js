@@ -12,7 +12,7 @@ $(document).ready(function () {
 
 function init() {
     send_message(FCSMSG.INIT, [], function (result) {
-        console.log(result)
+        // console.log(result)
         player = result.game
         players = player.players
         setup(players)
@@ -21,7 +21,7 @@ function init() {
 
 function loadPlayer() {
     send_message(FCSMSG.LOADPLAYER, [], function (result) {
-        console.log(result)
+        // console.log(result)
         player = result.game
         players = player.players
         setup(players)
@@ -54,7 +54,7 @@ function firstStart(newPlayer) {
     addInformationPanel(true, newPlayer)
     let newPlayers = newPlayer.players
     let alivePlayer = getAlivePlayer(false, newPlayer)
-    console.log(alivePlayer)
+    // console.log(alivePlayer)
     let j = 0
     let interval2 = setInterval(function () {
         if(j > 0)
@@ -97,7 +97,7 @@ function simulateBotMove(beforePlayer, newPlayer, callback, afterPlayer) {
     let newPlayers = newPlayer.players
     let alivePlayer = getAlivePlayer(afterPlayer, newPlayer)
     if(alivePlayer.length === 0){
-        console.log("why")
+        // console.log("why")
         player = newPlayer
         players = player.players
         if(callback)
@@ -149,7 +149,7 @@ function simulateBotMove(beforePlayer, newPlayer, callback, afterPlayer) {
 
         }, 900)
 
-        console.log('hi')
+        // console.log('hi')
     }
 }
 
@@ -216,7 +216,7 @@ function updatePlayerDecision(newPlayer, index) {
 
 function highlightPlayer(newPlayer, index) {
     let p = document.getElementById(FCSCLASS.PLAYER + "-" + (index+1))
-    console.log(index)
+    // console.log(index)
     p.classList.add(FCSCLASS.TURN)
 }
 
@@ -258,7 +258,7 @@ function determineGameStatus() {
 
 function getWinner() {
     send_message(FCSMSG.GETWINNER, [], function (result) {
-        console.log(result)
+        // console.log(result)
         player = result.game
         players = result.game.players
         let chip = checkPlayerChip()
@@ -272,7 +272,7 @@ function getWinner() {
 
 function repeatRound() {
     send_message(FCSMSG.REPEATROUND, [], function (result) {
-        console.log(result)
+        // console.log(result)
         // player = result
         // players = player.players
         let chip = checkPlayerChip()
@@ -301,7 +301,7 @@ function nextRound() {
         getWinner()
     }else{
         send_message(FCSMSG.NEXTROUND, [], function (result) {
-            console.log(result)
+            // console.log(result)
             // player = result
             // players = result.players
             let chip = checkPlayerChip()
@@ -345,7 +345,7 @@ function addCard(players) {
     let container = document.getElementById(FCSCLASS.MAINCONTAINER)
     let i = 0
     let interval = setInterval(function () {
-        console.log(i)
+        // console.log(i)
         if(players[i] !== 0 && i !== 3){
             document.getElementById(FCSCLASS.DUPLICATECARDPILE).removeAttribute(ATTRI.CLASS)
             document.getElementById(FCSCLASS.DUPLICATECARDPILE).classList.add('distribute-card-'+(i+1))
@@ -780,8 +780,8 @@ function showFinalResultDialog(players) {
 
 
 function removeAllChildren(node) {
-    if (!node)
-        console.log("WHAT?");
+    // if (!node)
+        // console.log("WHAT?");
     let child = node.firstElementChild;
     while (child) {
         child.remove();
@@ -869,7 +869,7 @@ function handleAddPlayer(num) {
     let agent = document.getElementById(FCSCLASS.ADDPLAYERDIALOGAGENTSELECTION).value
     let numIteration = document.getElementById(FCSCLASS.ADDPLAYERDIALOGAGENTNUMITERATION).value
     send_message(FCSMSG.ADDPLAYER,[num, name, agent, numIteration],function (result) {
-        console.log(result)
+        // console.log(result)
         player = result.game
         players = player.players
         setup(players)
@@ -879,7 +879,7 @@ function handleAddPlayer(num) {
 
 function handleDeletePlayer(num) {
     send_message(FCSMSG.DELETEPLAYER,[num],function (result) {
-        console.log(result)
+        // console.log(result)
         player = result.game
         players = player.players
         setup(players)
@@ -890,7 +890,7 @@ function handleDeletePlayer(num) {
 function handleDeleteHumanPlayer() {
     if(removeHumanPlayer === false){
         send_message(FCSMSG.DELETEPLAYER,[5],function (result) {
-            console.log(result)
+            // console.log(result)
             player = result.game
             players = player.players
             removeHumanPlayer = true
@@ -905,7 +905,7 @@ function handleResetGame() {
 
 function handleBegin() {
     send_message(FCSMSG.BEGIN, [], function (result) {
-        console.log(result)
+        // console.log(result)
         player = result.game
         players = player.players
         if(!result.game.terminal){
@@ -923,7 +923,7 @@ function handlePlayerOption(callbackName, arg, min, max) {
     if(arg === "1"){
         let input = document.getElementById(FCSCLASS.ADDCHIPINPUT)
         amount = Number(input.value)
-        console.log(amount)
+        // console.log(amount)
         if (!Number.isInteger(amount) || amount < Number(min) || amount > Number(max)){
             input.setAttribute(ATTRI.STYLE, "background:red;")
             return
@@ -932,7 +932,7 @@ function handlePlayerOption(callbackName, arg, min, max) {
     }
     removeButton()
     send_message(FCSMSG.PROCESSPLAYEROPTION, [callbackName, amount], function (result) {
-        console.log(result)
+        // console.log(result)
         let newPlayers = result.game.players
         updateInformationPanel(result.game)
         updatePlayerInformation(newPlayers[4], 4)
