@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, jsonify, redirect
 import json, os
-from five_card_stub.constants import *
-from five_card_stub.gui_simulate import *
+from five_card_stud.constants import *
+from five_card_stud.gui_simulate import *
 
 app = Flask(__name__)
 
