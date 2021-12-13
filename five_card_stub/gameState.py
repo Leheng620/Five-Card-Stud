@@ -96,13 +96,13 @@ class GameState:
                 When algorithm is "mcts_vs_random" or "mcts_vs_uniform", MCTS_iterations should be an integer
                 When algorithm is "mcts_vs_mcts", MCTS_iterations should be a list of integer of length 2
         '''
-        ALGORITHM = [MCTSAgent, UniformAgent, RandomAgent, HumanGUIAgent]
+        ALGORITHM = [RandomAgent, UniformAgent, RandomAgent, HumanGUIAgent]
         self.players = []
         for n in range(self.n_players):
             algor = algorithm[n][0]
             iteration = algorithm[n][1]
             if algor == 1:
-                self.players.append(ALGORITHM[algor-1](self.balance, n, 0, True, iteration))
+                self.players.append(ALGORITHM[algor-1](self.balance, n, 0, True))
             else:
                 self.players.append(ALGORITHM[algor-1](self.balance, n, 0, True))
 
