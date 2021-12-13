@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify, redirect
 import json, os
 from five_card_stud.constants import *
 from five_card_stud.gui_simulate import *
+import pickle
 
 app = Flask(__name__)
 
@@ -37,8 +38,19 @@ def load_init_game_state():
 
 
 def update_game(g, gs):
-    global game, game_state
-    game, game_state= g, gs
+    with open("game_dict.obj", "wb") as f:
+        pickle.dump(g, f)
+    with open("game_state.obj", "wb") as f:
+        pickle.dump(gs, f)
+    return g, gs
+
+def load_game():
+    with open("game_dict.obj", "rb") as f:
+        game = pickle.load(f)
+    with open("game_state.obj", "rb") as f:
+        game_state = pickle.load(f)
+
+    return game, game_state
 
 def get_dict_str(p):
     return jsonify(game=p)
@@ -52,21 +64,22 @@ def five_card_stud():
 @app.route('/fcsmsg', methods=['POST'])
 def fcs_msg():
     data = json.loads(request.get_data())
-    print(data)
-    global game, game_state
+    # print(data)
     if data['command'] == 'init':
         return_val = load_init_game_state()
         update_game(return_val, None)
         return_val = get_dict_str(return_val)
     elif data['command'] == 'load-player':
+        game, game_state = load_game()
         return_game, return_game_state = clear(game, game_state)
         update_game(return_game, return_game_state)
         return_val = get_dict_str(return_game)
     else:
+        game, game_state = load_game()
         return_game, return_game_state = command_control[data['command']](game, game_state, *data['args'])
         update_game(return_game, return_game_state)
         return_val = get_dict_str(return_game)
-    print(game)
+    # print(game)
     return return_val
 
 

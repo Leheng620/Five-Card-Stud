@@ -511,7 +511,7 @@ function buildControlButton() {
     let chipCap = Number(player.maxChip)
     let highestCap = player.currentMaxChip
 
-    let tempa = ['弃牌', '过牌', '跟注', '加注']
+    let tempa = ['fold', 'check', 'call', 'raise']
     let bu = document.createElement(HTMLTAG.BUTTON)
     bu.setAttribute(ATTRI.CLASS, FCSCLASS.CONTROLBUTTON)
     setupCallback(bu, EVENT.ONCLICK, FCSCALLBACK.HANDLEPLAYEROPTION, [FCSMSG.PLAYERGIVEUP, 0] )
